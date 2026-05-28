@@ -16,6 +16,7 @@ providers:
 
 ports:
   web:
+    hostPort: 80
     http:
       redirections:
         entryPoint:
@@ -23,6 +24,7 @@ ports:
           scheme: https
           permanent: true
   websecure:
+    hostPort: 443
     http:
       tls:
         enabled: true
