@@ -23,5 +23,5 @@
   "mounts": [
     "source=${localEnv:USERPROFILE}/.kube,target=/home/vscode/.kube,type=bind,consistency=cached"
   ],
-  "postCreateCommand": "kubectl version --client && helm version && argocd version --client"
+  "postCreateCommand": "kubectl version --client && helm version && argocd version --client && kind version"
 }
