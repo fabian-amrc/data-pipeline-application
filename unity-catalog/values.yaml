@@ -6,10 +6,28 @@ auth:
 
 server:
   replicaCount: 1
+  db:
+    fileConfig:
+      persistence:
+        enabled: false
+        createPVC: false
+  jwtKeypairSecret:
+    create: false
+    name: unity-catalog-unitycatalog-server-jwt-key
 
 ui:
   enabled: true
   replicaCount: 1
+  deployment:
+    extraVolumes:
+      - name: ui-env
+        configMap:
+          name: unity-catalog-ui-env
+    extraVolumeMounts:
+      - name: ui-env
+        mountPath: /ui/.env.local
+        subPath: .env.local
+        readOnly: true
 
 ingress:
   enabled: false

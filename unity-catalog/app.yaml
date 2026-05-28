@@ -21,6 +21,9 @@ spec:
     - repoURL: https://github.com/fabian-amrc/data-pipeline-application.git
       targetRevision: main
       ref: values
+    - repoURL: https://github.com/fabian-amrc/data-pipeline-application.git
+      targetRevision: main
+      path: unity-catalog/manifests
   syncPolicy:
     automated:
       prune: true

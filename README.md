@@ -92,11 +92,12 @@ The repo deploys Traefik and exposes dashboard routes for:
 - `traefik.local` → Traefik dashboard
 - `argocd.local` → Argo CD UI
 - `minio.local` → MinIO console
+- `unity-catolog.local` → Unity catalog UI
 
 If you are running locally, add entries to your `/etc/hosts` file such as:
 
 ```text
-127.0.0.1 traefik.local argocd.local minio.local
+127.0.0.1 traefik.local argocd.local minio.local unity-catalog.local
 ```
 
 Then access the dashboards in your browser at the matching hostnames.

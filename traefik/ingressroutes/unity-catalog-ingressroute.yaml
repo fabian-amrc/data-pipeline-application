@@ -1,0 +1,15 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: unity-catalog-ui
+  namespace: unity-catalog
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`unity-catalog.local`)
+      kind: Rule
+      services:
+        - name: unity-catalog-unitycatalog-ui
+          namespace: unity-catalog
+          port: 3000
