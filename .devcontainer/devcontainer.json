@@ -16,7 +16,7 @@
         "esbenp.prettier-vscode",
         "github.vscode-github-actions",
         "GitHub.copilot",
-        "OpenAI.openai-chatgpt"
+        "openai.chatgpt"
       ]
     }
   },
