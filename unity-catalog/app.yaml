@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: unity-catalog
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "30"
+spec:
+  project: data-pipeline
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: unity-catalog
+  sources:
+    - repoURL: https://github.com/unitycatalog/unitycatalog.git
+      targetRevision: v0.3.1
+      path: helm
+      helm:
+        releaseName: unity-catalog
+        valueFiles:
+          - $values/unity-catalog/values.yaml
+    - repoURL: https://github.com/fabian-amrc/data-pipeline-application.git
+      targetRevision: main
+      ref: values
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

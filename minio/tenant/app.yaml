@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: minio-tenant
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "20"
+spec:
+  project: data-pipeline
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: minio-tenant
+  sources:
+    - repoURL: https://github.com/minio/operator.git
+      targetRevision: v7.1.1
+      path: helm/tenant
+      helm:
+        releaseName: minio-tenant
+        valueFiles:
+          - $values/minio/tenant/values.yaml
+    - repoURL: https://github.com/fabian-amrc/data-pipeline-application.git
+      targetRevision: main
+      ref: values
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: spark-operator
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+spec:
+  project: data-pipeline
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: spark-operator
+  sources:
+    - repoURL: https://kubeflow.github.io/spark-operator
+      chart: spark-operator
+      targetRevision: 2.5.0
+      helm:
+        releaseName: spark-operator
+        valueFiles:
+          - $values/spark/operator/values.yaml
+    - repoURL: https://github.com/fabian-amrc/data-pipeline-application.git
+      targetRevision: main
+      ref: values
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: data-pipeline
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  description: Data pipeline platform applications managed with the app-of-apps pattern.
+  sourceRepos:
+    - https://github.com/fabian-amrc/data-pipeline-application.git
+    - https://argoproj.github.io/argo-helm
+    - https://kubeflow.github.io/spark-operator
+    - https://github.com/minio/operator.git
+    - https://github.com/unitycatalog/unitycatalog.git
+    - https://traefik.github.io/charts
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: '*'
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'

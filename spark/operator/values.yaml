@@ -1,0 +1,17 @@
+controller:
+  replicas: 1
+
+webhook:
+  enable: true
+
+spark:
+  jobNamespaces:
+    - spark-jobs
+  serviceAccount:
+    create: true
+  rbac:
+    create: true
+
+prometheus:
+  metrics:
+    enable: true

@@ -1,0 +1,15 @@
+tenant:
+  name: data-pipeline
+  pools:
+    - servers: 1
+      name: pool-0
+      volumesPerServer: 4
+      size: 10Gi
+  certificate:
+    requestAutoCert: false
+
+ingress:
+  api:
+    enabled: false
+  console:
+    enabled: false

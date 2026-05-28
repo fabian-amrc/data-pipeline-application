@@ -1,0 +1,15 @@
+storage:
+  modelStorageRoot: file:/tmp/ucroot
+
+auth:
+  enabled: false
+
+server:
+  replicaCount: 1
+
+ui:
+  enabled: true
+  replicaCount: 1
+
+ingress:
+  enabled: false

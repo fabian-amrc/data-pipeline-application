@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: data-pipeline-apps
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: data-pipeline
+  source:
+    repoURL: https://github.com/fabian-amrc/data-pipeline-application.git
+    targetRevision: main
+    path: .
+    directory:
+      recurse: true
+      include: "{app-of-apps/project.yaml,argo/app.yaml,spark/operator/app.yaml,minio/operator/app.yaml,minio/tenant/app.yaml,unity-catalog/app.yaml,traefik/app.yaml}"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
