@@ -47,6 +47,15 @@ and pulls environment values from this repository using Argo CD multiple sources
 
 ## Bootstrap
 
+For a local `kind` cluster from inside the devcontainer, run:
+
+```sh
+.devcontainer/scripts/setup-kind-cluster.sh
+```
+
+The script creates or reuses a `data-pipeline` kind cluster, installs Argo CD, and applies the app-of-apps bootstrap manifests.
+
+
 Install Argo CD first, then apply the project and root application:
 
 ```sh
