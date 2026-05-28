@@ -1,0 +1,15 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: minio-console
+  namespace: minio-tenant
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`minio.local`)
+      kind: Rule
+      services:
+        - name: minio
+          namespace: minio-tenant
+          port: 9000

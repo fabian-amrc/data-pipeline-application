@@ -75,3 +75,19 @@ sources:
 - Update hostnames, ingress, storage classes, and resource sizing before production use.
 - The MinIO tenant values are intentionally small and suitable for a starting point only.
 - The `spark-jobs` directory is reserved for SparkApplication manifests or future Argo applications.
+
+## Local Dashboard Access
+
+The repo deploys Traefik and exposes dashboard routes for:
+
+- `traefik.local` → Traefik dashboard
+- `argocd.local` → Argo CD UI
+- `minio.local` → MinIO console
+
+If you are running locally, add entries to your `/etc/hosts` file such as:
+
+```text
+127.0.0.1 traefik.local argocd.local minio.local
+```
+
+Then access the dashboards in your browser at the matching hostnames.

@@ -26,3 +26,10 @@ ports:
     http:
       tls:
         enabled: true
+api:
+  dashboard: true
+ingressRoute:
+  dashboard:
+    enabled: true
+    entryPoints:
+      - websecure
