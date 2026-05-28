@@ -1,0 +1,41 @@
+FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04
+
+ARG TARGETARCH
+
+RUN apt-get update && apt-get install -y \
+    curl \
+    wget \
+    unzip \
+    jq \
+    yq \
+    ca-certificates \
+    gnupg \
+    lsb-release \
+    python3 \
+    python3-pip \
+    python3-venv \
+    make \
+    && rm -rf /var/lib/apt/lists/*
+
+# kubectl
+RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/${TARGETARCH}/kubectl" \
+    && install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl \
+    && rm kubectl
+
+# Helm
+RUN curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+# Argo CD CLI
+RUN curl -sSL -o /usr/local/bin/argocd "https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-${TARGETARCH}" \
+    && chmod +x /usr/local/bin/argocd
+
+# Kustomize
+RUN curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash \
+    && mv kustomize /usr/local/bin/
+
+# Optional: useful validation tools
+RUN curl -sSL -o /tmp/kubeconform.tar.gz "https://github.com/yannh/kubeconform/releases/latest/download/kubeconform-linux-${TARGETARCH}.tar.gz" \
+    && tar -xzf /tmp/kubeconform.tar.gz -C /usr/local/bin kubeconform \
+    && rm /tmp/kubeconform.tar.gz
+
+USER vscode
