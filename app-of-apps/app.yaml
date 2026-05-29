@@ -13,7 +13,7 @@ spec:
     path: .
     directory:
       recurse: true
-      include: "{app-of-apps/project.yaml,argo/app.yaml,spark/operator/app.yaml,minio/operator/app.yaml,minio/tenant/app.yaml,unity-catalog/app.yaml,traefik/app.yaml,traefik/ingressroutes/app.yaml}"
+      include: "{app-of-apps/project.yaml,argo/app.yaml,spark/namespaces/spark-jobs.yaml,spark/operator/app.yaml,spark/spark-jobs/app.yaml,minio/operator/app.yaml,minio/tenant/app.yaml,unity-catalog/app.yaml,traefik/app.yaml,traefik/ingressroutes/app.yaml}"
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd

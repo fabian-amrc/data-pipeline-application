@@ -1,0 +1,51 @@
+apiVersion: sparkoperator.k8s.io/v1beta2
+kind: SparkApplication
+metadata:
+  name: unity-catalog-smoke-test
+  namespace: spark-jobs
+spec:
+  type: Python
+  mode: cluster
+  image: apache/spark:3.5.3
+  imagePullPolicy: IfNotPresent
+  mainApplicationFile: local:///opt/spark/work-dir/uc_smoke_test.py
+  sparkVersion: "3.5.3"
+  restartPolicy:
+    type: Never
+  deps:
+    packages:
+      - io.delta:delta-spark_2.12:3.2.1
+      - io.unitycatalog:unitycatalog-spark_2.12:0.2.1
+  sparkConf:
+    spark.jars.ivy: /tmp/.ivy2
+    spark.sql.extensions: io.delta.sql.DeltaSparkSessionExtension
+    spark.sql.catalog.spark_catalog: org.apache.spark.sql.delta.catalog.DeltaCatalog
+    spark.sql.catalog.unity: io.unitycatalog.spark.UCSingleCatalog
+    spark.sql.catalog.unity.uri: http://unity-catalog-unitycatalog-server.unity-catalog.svc.cluster.local:8080
+    spark.sql.catalog.unity.token: ""
+    spark.sql.defaultCatalog: unity
+  volumes:
+    - name: uc-smoke-test-script
+      configMap:
+        name: uc-smoke-test-script
+        defaultMode: 0555
+  driver:
+    cores: 1
+    memory: 1g
+    labels:
+      version: 3.5.3
+    serviceAccount: spark-operator-spark
+    volumeMounts:
+      - name: uc-smoke-test-script
+        mountPath: /opt/spark/work-dir/uc_smoke_test.py
+        subPath: uc_smoke_test.py
+  executor:
+    cores: 1
+    instances: 1
+    memory: 1g
+    labels:
+      version: 3.5.3
+    volumeMounts:
+      - name: uc-smoke-test-script
+        mountPath: /opt/spark/work-dir/uc_smoke_test.py
+        subPath: uc_smoke_test.py
