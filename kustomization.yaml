@@ -6,7 +6,7 @@ resources:
   - argo/app.yaml
   - spark/namespaces/spark-jobs.yaml
   - spark/operator/app.yaml
-  - spark/spark-jobs/app.yaml
+  - spark/spark-applications/app.yaml
   - minio/operator/app.yaml
   - minio/tenant/app.yaml
   - unity-catalog/app.yaml

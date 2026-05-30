@@ -2,7 +2,8 @@ deployment:
   replicas: 1
 
 service:
-  type: LoadBalancer
+  spec:
+    type: ClusterIP
 
 ingressClass:
   enabled: true
