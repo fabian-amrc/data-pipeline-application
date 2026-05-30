@@ -46,4 +46,7 @@ COPY conf/spark-defaults.conf /opt/bitnami/spark/conf/spark-defaults.conf
 
 RUN chmod -R a+r /opt/bitnami/spark/jars /opt/bitnami/spark/conf/spark-defaults.conf
 
+WORKDIR /app
+RUN chown -R 1001:1001 /app
+
 USER 1001
