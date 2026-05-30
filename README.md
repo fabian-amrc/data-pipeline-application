@@ -65,7 +65,11 @@ For a local `kind` cluster from inside the devcontainer, run:
 .devcontainer/scripts/setup-kind-cluster.sh
 ```
 
-The script creates or reuses a `data-pipeline` kind cluster, installs Argo CD, and applies the app-of-apps bootstrap manifests.
+The script creates or reuses a `data-pipeline` kind cluster, installs Argo CD, applies the app-of-apps bootstrap manifests, and writes a host-facing kubeconfig to `.devcontainer/kubeconfig`. Use it from your local machine with:
+
+```sh
+KUBECONFIG=.devcontainer/kubeconfig k9s
+```
 
 
 Install Argo CD first, then apply the project and root application:

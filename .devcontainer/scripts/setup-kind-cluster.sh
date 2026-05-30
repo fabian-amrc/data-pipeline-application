@@ -7,6 +7,7 @@ KIND_NODE_IMAGE="${KIND_NODE_IMAGE:-kindest/node:v1.34.3@sha256:08497ee19eace7b4
 KIND_POD_SUBNET="${KIND_POD_SUBNET:-10.244.0.0/16}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+HOST_KUBECONFIG="${HOST_KUBECONFIG:-${REPO_ROOT}/.devcontainer/kubeconfig}"
 
 require_command() {
   if ! command -v "$1" >/dev/null 2>&1; then
@@ -39,6 +40,13 @@ export_internal_kubeconfig() {
   connect_to_kind_network
   kind export kubeconfig --name "${CLUSTER_NAME}" --internal >/dev/null
   kubectl config use-context "kind-${CLUSTER_NAME}" >/dev/null
+}
+
+export_host_kubeconfig() {
+  echo "Writing host kubeconfig: ${HOST_KUBECONFIG}"
+  mkdir -p "$(dirname "${HOST_KUBECONFIG}")"
+  kind export kubeconfig --name "${CLUSTER_NAME}" --kubeconfig "${HOST_KUBECONFIG}" >/dev/null
+  chmod 600 "${HOST_KUBECONFIG}"
 }
 
 wait_for_control_plane() {
@@ -125,6 +133,8 @@ KIND_CONFIG_EOF
   export_internal_kubeconfig
 fi
 
+export_host_kubeconfig
+
 echo "Ensuring namespace exists: ${ARGO_NAMESPACE}"
 kubectl create namespace "${ARGO_NAMESPACE}" --dry-run=client -o yaml | kubectl apply -f -
 
@@ -143,6 +153,8 @@ kubectl wait --for=jsonpath='{.metadata.name}'=data-pipeline-apps application/da
 
 echo "Cluster setup complete."
 echo "Context: kind-${CLUSTER_NAME}"
+echo "Host kubeconfig: ${HOST_KUBECONFIG}"
+echo "Local k9s: KUBECONFIG=${HOST_KUBECONFIG} k9s"
 echo "Argo CD namespace: ${ARGO_NAMESPACE}"
 echo "Initial admin password: kubectl -n ${ARGO_NAMESPACE} get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d && echo"
 echo "Argo CD UI port-forward: kubectl -n ${ARGO_NAMESPACE} port-forward svc/argo-cd-argocd-server 8080:80"
