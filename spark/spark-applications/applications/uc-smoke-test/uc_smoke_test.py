@@ -5,6 +5,12 @@ import urllib.request
 from pyspark.sql import SparkSession
 
 
+def get_json(path):
+    request = urllib.request.Request(f"{UC_URI}{path}", method="GET")
+    with urllib.request.urlopen(request, timeout=10) as response:
+        return json.loads(response.read().decode("utf-8"))
+
+
 UC_URI = "http://unity-catalog-unitycatalog-server.unity-catalog.svc.cluster.local:8080"
 
 
@@ -39,7 +45,16 @@ post_if_missing(
 spark = SparkSession.builder.appName("unity-catalog-smoke-test").getOrCreate()
 
 print("Spark version:", spark.version)
-print("Unity Catalog schemas:")
+print("Unity Catalog REST catalogs:")
+print(json.dumps(get_json("/api/2.1/unity-catalog/catalogs"), indent=2, sort_keys=True))
+
+print("Spark current catalog:")
+spark.sql("SELECT current_catalog() AS catalog, current_database() AS schema").show(truncate=False)
+
+print("Spark catalogs:")
+spark.sql("SHOW CATALOGS").show(truncate=False)
+
+print("Unity Catalog schemas in current catalog:")
 spark.sql("SHOW SCHEMAS").show(truncate=False)
 
 print("Unity Catalog default schema tables:")
