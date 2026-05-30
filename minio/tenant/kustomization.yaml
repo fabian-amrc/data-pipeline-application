@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+helmCharts:
+  - name: tenant
+    repo: https://operator.min.io
+    version: 7.1.1
+    releaseName: minio-tenant
+    namespace: minio-tenant
+    valuesFile: values.yaml
+    includeCRDs: true

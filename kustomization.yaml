@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - app-of-apps/project.yaml
+  - app-of-apps/app.yaml
+  - argo/app.yaml
+  - spark/namespaces/spark-jobs.yaml
+  - spark/operator/app.yaml
+  - spark/spark-jobs/app.yaml
+  - minio/operator/app.yaml
+  - minio/tenant/app.yaml
+  - unity-catalog/app.yaml
+  - traefik/app.yaml
+  - traefik/ingressroutes/app.yaml

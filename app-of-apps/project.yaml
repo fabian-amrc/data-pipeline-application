@@ -9,11 +9,6 @@ spec:
   description: Data pipeline platform applications managed with the app-of-apps pattern.
   sourceRepos:
     - https://github.com/fabian-amrc/data-pipeline-application.git
-    - https://argoproj.github.io/argo-helm
-    - https://kubeflow.github.io/spark-operator
-    - https://github.com/minio/operator.git
-    - https://github.com/unitycatalog/unitycatalog.git
-    - https://traefik.github.io/charts
   destinations:
     - server: https://kubernetes.default.svc
       namespace: '*'

@@ -1,8 +1,8 @@
 # Data Pipeline Application
 
 This repository contains an Argo CD app-of-apps scaffold for a Kubernetes data platform.
-Each child application pulls its upstream Helm chart from the project-owned chart source
-and pulls environment values from this repository using Argo CD multiple sources.
+Applications point at local Kustomize roots. Helm-backed components are rendered with
+Kustomize `helmCharts`, using values files committed alongside each app.
 
 ## Layout
 
@@ -13,24 +13,36 @@ and pulls environment values from this repository using Argo CD multiple sources
 |  `- project.yaml
 |- argo/
 |  |- app.yaml
+|  |- kustomization.yaml
 |  `- values.yaml
 |- spark/
-|  `- operator/
+|  |- operator/
+|  |  |- app.yaml
+|  |  |- kustomization.yaml
+|  |  `- values.yaml
+|  `- spark-jobs/
 |     |- app.yaml
-|     `- values.yaml
-|- spark-jobs/
+|     |- kustomization.yaml
+|     `- jobs/
 |- minio/
 |  |- operator/
 |  |  |- app.yaml
+|  |  |- kustomization.yaml
 |  |  `- values.yaml
 |  `- tenant/
 |     |- app.yaml
+|     |- kustomization.yaml
 |     `- values.yaml
 |- unity-catalog/
 |  |- app.yaml
+|  |- charts/unitycatalog/
+|  |- kustomization.yaml
+|  |- manifests/
 |  `- values.yaml
 `- traefik/
    |- app.yaml
+   |- kustomization.yaml
+   |- ingressroutes/
    `- values.yaml
 ```
 
@@ -40,9 +52,9 @@ and pulls environment values from this repository using Argo CD multiple sources
 | --- | --- | --- |
 | Argo CD | `https://argoproj.github.io/argo-helm`, chart `argo-cd` | `9.5.15` |
 | Spark Operator | `https://kubeflow.github.io/spark-operator`, chart `spark-operator` | `2.5.0` |
-| MinIO Operator | `https://github.com/minio/operator.git`, path `helm/operator` | `v7.1.1` |
-| MinIO Tenant | `https://github.com/minio/operator.git`, path `helm/tenant` | `v7.1.1` |
-| Unity Catalog | `https://github.com/unitycatalog/unitycatalog.git`, path `helm` | `v0.3.1` |
+| MinIO Operator | `https://operator.min.io`, chart `operator` | `7.1.1` |
+| MinIO Tenant | `https://operator.min.io`, chart `tenant` | `7.1.1` |
+| Unity Catalog | Vendored from `https://github.com/unitycatalog/unitycatalog.git`, path `helm` | `v0.3.1` |
 | Traefik | `https://traefik.github.io/charts`, chart `traefik` | `40.2.0` |
 
 ## Bootstrap
@@ -63,27 +75,36 @@ kubectl apply -f app-of-apps/project.yaml
 kubectl apply -f app-of-apps/app.yaml
 ```
 
-The root application syncs the child `Application` manifests. Child applications use
-Argo CD's multi-source Helm values pattern:
+The root application syncs the child `Application` manifests. Child applications point
+at local Kustomize roots:
 
 ```yaml
-sources:
-  - repoURL: https://example.com/chart-repo
-    chart: example
-    targetRevision: 1.2.3
-    helm:
-      valueFiles:
-        - $values/path/to/values.yaml
-  - repoURL: https://github.com/fabian-amrc/data-pipeline-application.git
-    targetRevision: main
-    ref: values
+source:
+  repoURL: https://github.com/fabian-amrc/data-pipeline-application.git
+  targetRevision: main
+  path: traefik
 ```
+
+Helm-backed Kustomize roots render charts with `helmCharts`:
+
+```yaml
+helmCharts:
+  - name: example
+    repo: https://example.com/chart-repo
+    version: 1.2.3
+    releaseName: example
+    namespace: example
+    valuesFile: values.yaml
+```
+
+Argo CD must run Kustomize with Helm enabled. The Argo CD values set
+`configs.cm.kustomize.buildOptions: --enable-helm` for this.
 
 ## Notes
 
 - Update hostnames, ingress, storage classes, and resource sizing before production use.
 - The MinIO tenant values are intentionally small and suitable for a starting point only.
-- The `spark-jobs` directory is reserved for SparkApplication manifests or future Argo applications.
+- The Spark smoke-test Python script is stored as a `.py` file and generated into a ConfigMap by Kustomize.
 
 ## Local Dashboard Access
 
@@ -92,7 +113,7 @@ The repo deploys Traefik and exposes dashboard routes for:
 - `traefik.local` → Traefik dashboard
 - `argocd.local` → Argo CD UI
 - `minio.local` → MinIO console
-- `unity-catolog.local` → Unity catalog UI
+- `unity-catalog.local` → Unity catalog UI
 
 If you are running locally, add entries to your `/etc/hosts` file such as:
 

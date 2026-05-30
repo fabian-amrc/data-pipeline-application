@@ -10,17 +10,10 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
-  sources:
-    - repoURL: https://argoproj.github.io/argo-helm
-      chart: argo-cd
-      targetRevision: 9.5.15
-      helm:
-        releaseName: argo-cd
-        valueFiles:
-          - $values/argo/values.yaml
-    - repoURL: https://github.com/fabian-amrc/data-pipeline-application.git
-      targetRevision: main
-      ref: values
+  source:
+    repoURL: https://github.com/fabian-amrc/data-pipeline-application.git
+    targetRevision: main
+    path: argo
   syncPolicy:
     automated:
       prune: true

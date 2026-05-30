@@ -11,8 +11,6 @@ spec:
     repoURL: https://github.com/fabian-amrc/data-pipeline-application.git
     targetRevision: main
     path: spark/spark-jobs
-    directory:
-      recurse: true
   destination:
     server: https://kubernetes.default.svc
     namespace: spark-jobs

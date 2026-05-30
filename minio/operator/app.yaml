@@ -10,17 +10,10 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: minio-operator
-  sources:
-    - repoURL: https://github.com/minio/operator.git
-      targetRevision: v7.1.1
-      path: helm/operator
-      helm:
-        releaseName: minio-operator
-        valueFiles:
-          - $values/minio/operator/values.yaml
-    - repoURL: https://github.com/fabian-amrc/data-pipeline-application.git
-      targetRevision: main
-      ref: values
+  source:
+    repoURL: https://github.com/fabian-amrc/data-pipeline-application.git
+    targetRevision: main
+    path: minio/operator
   syncPolicy:
     automated:
       prune: true

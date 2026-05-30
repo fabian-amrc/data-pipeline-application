@@ -1,0 +1,6 @@
+# Kustomize Helm chart cache for remote charts.
+argo/charts/
+spark/operator/charts/
+minio/operator/charts/
+minio/tenant/charts/
+traefik/charts/

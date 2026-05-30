@@ -10,17 +10,10 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: traefik
-  sources:
-    - repoURL: https://traefik.github.io/charts
-      chart: traefik
-      targetRevision: 40.2.0
-      helm:
-        releaseName: traefik
-        valueFiles:
-          - $values/traefik/values.yaml
-    - repoURL: https://github.com/fabian-amrc/data-pipeline-application.git
-      targetRevision: main
-      ref: values
+  source:
+    repoURL: https://github.com/fabian-amrc/data-pipeline-application.git
+    targetRevision: main
+    path: traefik
   syncPolicy:
     automated:
       prune: true

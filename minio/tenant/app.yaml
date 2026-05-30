@@ -10,17 +10,10 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: minio-tenant
-  sources:
-    - repoURL: https://github.com/minio/operator.git
-      targetRevision: v7.1.1
-      path: helm/tenant
-      helm:
-        releaseName: minio-tenant
-        valueFiles:
-          - $values/minio/tenant/values.yaml
-    - repoURL: https://github.com/fabian-amrc/data-pipeline-application.git
-      targetRevision: main
-      ref: values
+  source:
+    repoURL: https://github.com/fabian-amrc/data-pipeline-application.git
+    targetRevision: main
+    path: minio/tenant
   syncPolicy:
     automated:
       prune: true

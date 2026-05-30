@@ -10,20 +10,10 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: unity-catalog
-  sources:
-    - repoURL: https://github.com/unitycatalog/unitycatalog.git
-      targetRevision: v0.3.1
-      path: helm
-      helm:
-        releaseName: unity-catalog
-        valueFiles:
-          - $values/unity-catalog/values.yaml
-    - repoURL: https://github.com/fabian-amrc/data-pipeline-application.git
-      targetRevision: main
-      ref: values
-    - repoURL: https://github.com/fabian-amrc/data-pipeline-application.git
-      targetRevision: main
-      path: unity-catalog/manifests
+  source:
+    repoURL: https://github.com/fabian-amrc/data-pipeline-application.git
+    targetRevision: main
+    path: unity-catalog
   syncPolicy:
     automated:
       prune: true

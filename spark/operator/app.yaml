@@ -10,17 +10,10 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: spark-operator
-  sources:
-    - repoURL: https://kubeflow.github.io/spark-operator
-      chart: spark-operator
-      targetRevision: 2.5.0
-      helm:
-        releaseName: spark-operator
-        valueFiles:
-          - $values/spark/operator/values.yaml
-    - repoURL: https://github.com/fabian-amrc/data-pipeline-application.git
-      targetRevision: main
-      ref: values
+  source:
+    repoURL: https://github.com/fabian-amrc/data-pipeline-application.git
+    targetRevision: main
+    path: spark/operator
   syncPolicy:
     automated:
       prune: true
