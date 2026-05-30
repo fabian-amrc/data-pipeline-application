@@ -3,5 +3,4 @@ kind: Kustomization
 resources:
   - argocd-ingressroute.yaml
   - minio-ingressroute.yaml
-  - traefik-dashboard-ingressroute.yaml
   - unity-catalog-ingressroute.yaml

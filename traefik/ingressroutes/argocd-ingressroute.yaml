@@ -10,6 +10,6 @@ spec:
     - match: Host(`argocd.local`)
       kind: Rule
       services:
-        - name: argocd-server
+        - name: argo-cd-argocd-server
           namespace: argocd
           port: 80

@@ -33,5 +33,6 @@ api:
 ingressRoute:
   dashboard:
     enabled: true
+    matchRule: Host(`traefik.local`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
     entryPoints:
       - websecure

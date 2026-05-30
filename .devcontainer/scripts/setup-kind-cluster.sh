@@ -3,7 +3,6 @@ set -euo pipefail
 
 CLUSTER_NAME="${CLUSTER_NAME:-data-pipeline}"
 ARGO_NAMESPACE="${ARGO_NAMESPACE:-argocd}"
-ARGO_INSTALL_URL="${ARGO_INSTALL_URL:-https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml}"
 KIND_NODE_IMAGE="${KIND_NODE_IMAGE:-kindest/node:v1.34.3@sha256:08497ee19eace7b4b5348db5c6a1591d7752b164530a36f855cb0f2bdcbadd48}"
 KIND_POD_SUBNET="${KIND_POD_SUBNET:-10.244.0.0/16}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -84,6 +83,7 @@ recover_kind_create() {
 require_command docker
 require_command kind
 require_command kubectl
+require_command kustomize
 
 if ! docker info >/dev/null 2>&1; then
   echo "Docker is not available. Start Docker on the host and make sure the devcontainer has Docker access." >&2
@@ -128,8 +128,8 @@ fi
 echo "Ensuring namespace exists: ${ARGO_NAMESPACE}"
 kubectl create namespace "${ARGO_NAMESPACE}" --dry-run=client -o yaml | kubectl apply -f -
 
-echo "Installing Argo CD base manifests"
-kubectl apply --server-side --force-conflicts -n "${ARGO_NAMESPACE}" -f "${ARGO_INSTALL_URL}"
+echo "Installing Argo CD with Kustomize Helm"
+kustomize build --enable-helm "${REPO_ROOT}/argo" | kubectl apply --server-side --force-conflicts -f -
 
 echo "Waiting for Argo CD deployments"
 kubectl wait --for=condition=Available deployment --all -n "${ARGO_NAMESPACE}" --timeout=300s
@@ -145,4 +145,4 @@ echo "Cluster setup complete."
 echo "Context: kind-${CLUSTER_NAME}"
 echo "Argo CD namespace: ${ARGO_NAMESPACE}"
 echo "Initial admin password: kubectl -n ${ARGO_NAMESPACE} get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d && echo"
-echo "Argo CD UI port-forward: kubectl -n ${ARGO_NAMESPACE} port-forward svc/argocd-server 8080:443"
+echo "Argo CD UI port-forward: kubectl -n ${ARGO_NAMESPACE} port-forward svc/argo-cd-argocd-server 8080:80"
