@@ -6,6 +6,8 @@ This directory contains the Spark operator deployment and example Spark applicat
 
 - `operator/app.yaml` - Argo CD application for the Spark operator chart
 - `operator/values.yaml` - Helm values used by the Spark operator application
+- `image/Dockerfile` - Local Spark image with shared Delta, Unity Catalog, Kafka, and CA certificate setup
+- `image/conf/spark-defaults.conf` - Shared Spark SQL and Unity Catalog defaults baked into the local image
 - `spark-applications/app.yaml` - Argo CD application for SparkApplication resources
 - `spark-applications/applications/spark-pi/spark-pi-sparkapplication.yaml` - Spark Pi sample application for testing
 
@@ -46,5 +48,16 @@ kubectl logs -n spark-jobs -l spark-role=driver
 ## Notes
 
 - The sample Spark Pi job uses the `sparkoperator.k8s.io/v1beta2` API.
-- If the operator is not ready, the SparkApplication will remain pending until the CRD is agivailable.
-- Update the `spark/spark-applications/applications/spark-pi/spark-pi-sparkapplication.yaml` values if you need a different Spark image, main class, or resource sizing.
+- If the operator is not ready, the SparkApplication will remain pending until the CRD is available.
+- Update `spark/image/Dockerfile` for shared Spark dependencies, `spark/image/conf/spark-defaults.conf` for shared Spark configuration, or the individual SparkApplication manifests for per-job image, main class, and resource sizing changes.
+
+## Local Spark image
+
+The kind bootstrap script builds `data-pipeline-spark:3.5.3` from `spark/image` and loads it into the `data-pipeline` kind cluster. To add a local MinIO CA certificate, place it at `spark/image/certs/minikubeCA.crt` before running the bootstrap script.
+
+You can build and load the image manually with:
+
+```sh
+docker build -t data-pipeline-spark:3.5.3 spark/image
+kind load docker-image data-pipeline-spark:3.5.3 --name data-pipeline
+```

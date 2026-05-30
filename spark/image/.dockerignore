@@ -1,0 +1,4 @@
+*.md
+certs/*
+!certs/.gitkeep
+!certs/minikubeCA.crt

@@ -20,10 +20,12 @@ Kustomize `helmCharts`, using values files committed alongside each app.
 |  |  |- app.yaml
 |  |  |- kustomization.yaml
 |  |  `- values.yaml
-|  `- spark-jobs/
+|  |- image/
+|  |  `- Dockerfile
+|  `- spark-applications/
 |     |- app.yaml
 |     |- kustomization.yaml
-|     `- jobs/
+|     `- applications/
 |- minio/
 |  |- operator/
 |  |  |- app.yaml
@@ -65,7 +67,7 @@ For a local `kind` cluster from inside the devcontainer, run:
 .devcontainer/scripts/setup-kind-cluster.sh
 ```
 
-The script creates or reuses a `data-pipeline` kind cluster, installs Argo CD, applies the app-of-apps bootstrap manifests, and writes a host-facing kubeconfig to `.devcontainer/kubeconfig`. Use it from your local machine with:
+The script creates or reuses a `data-pipeline` kind cluster, builds and loads the local Spark image into kind, installs Argo CD, applies the app-of-apps bootstrap manifests, and writes a host-facing kubeconfig to `.devcontainer/kubeconfig`. Use it from your local machine with:
 
 ```sh
 KUBECONFIG=.devcontainer/kubeconfig k9s
@@ -108,7 +110,7 @@ Argo CD must run Kustomize with Helm enabled. The Argo CD values set
 
 - Update hostnames, ingress, storage classes, and resource sizing before production use.
 - The MinIO tenant values are intentionally small and suitable for a starting point only.
-- The Spark smoke-test Python script is stored as a `.py` file and generated into a ConfigMap by Kustomize.
+- The Spark smoke-test Python script is stored as a `.py` file and generated into a ConfigMap by Kustomize. Spark applications use the local `data-pipeline-spark:3.5.3` image built from `spark/image`.
 
 ## Local Dashboard Access
 

@@ -8,6 +8,9 @@ KIND_POD_SUBNET="${KIND_POD_SUBNET:-10.244.0.0/16}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 HOST_KUBECONFIG="${HOST_KUBECONFIG:-${REPO_ROOT}/.devcontainer/kubeconfig}"
+SPARK_IMAGE="${SPARK_IMAGE:-data-pipeline-spark:3.5.3}"
+SPARK_IMAGE_CONTEXT="${SPARK_IMAGE_CONTEXT:-${REPO_ROOT}/spark/image}"
+SPARK_IMAGE_BUILD="${SPARK_IMAGE_BUILD:-true}"
 
 require_command() {
   if ! command -v "$1" >/dev/null 2>&1; then
@@ -47,6 +50,19 @@ export_host_kubeconfig() {
   mkdir -p "$(dirname "${HOST_KUBECONFIG}")"
   kind export kubeconfig --name "${CLUSTER_NAME}" --kubeconfig "${HOST_KUBECONFIG}" >/dev/null
   chmod 600 "${HOST_KUBECONFIG}"
+}
+
+build_and_load_spark_image() {
+  if [ "${SPARK_IMAGE_BUILD}" != "true" ]; then
+    echo "Skipping Spark image build because SPARK_IMAGE_BUILD=${SPARK_IMAGE_BUILD}"
+    return 0
+  fi
+
+  echo "Building Spark image: ${SPARK_IMAGE}"
+  docker build -t "${SPARK_IMAGE}" "${SPARK_IMAGE_CONTEXT}"
+
+  echo "Loading Spark image into kind cluster: ${CLUSTER_NAME}"
+  kind load docker-image "${SPARK_IMAGE}" --name "${CLUSTER_NAME}"
 }
 
 wait_for_control_plane() {
@@ -134,6 +150,7 @@ KIND_CONFIG_EOF
 fi
 
 export_host_kubeconfig
+build_and_load_spark_image
 
 echo "Ensuring namespace exists: ${ARGO_NAMESPACE}"
 kubectl create namespace "${ARGO_NAMESPACE}" --dry-run=client -o yaml | kubectl apply -f -
@@ -154,6 +171,7 @@ kubectl wait --for=jsonpath='{.metadata.name}'=data-pipeline-apps application/da
 echo "Cluster setup complete."
 echo "Context: kind-${CLUSTER_NAME}"
 echo "Host kubeconfig: ${HOST_KUBECONFIG}"
+echo "Spark image: ${SPARK_IMAGE}"
 echo "Local k9s: KUBECONFIG=${HOST_KUBECONFIG} k9s"
 echo "Argo CD namespace: ${ARGO_NAMESPACE}"
 echo "Initial admin password: kubectl -n ${ARGO_NAMESPACE} get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d && echo"
