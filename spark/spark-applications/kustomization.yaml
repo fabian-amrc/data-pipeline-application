@@ -8,5 +8,12 @@ configMapGenerator:
   - name: uc-smoke-test-script
     files:
       - uc_smoke_test.py=applications/uc-smoke-test/uc_smoke_test.py
+patches:
+  - path: patches/common-spark-conf.yaml
+    target:
+      group: sparkoperator.k8s.io
+      version: v1beta2
+      kind: SparkApplication
+
 generatorOptions:
   disableNameSuffixHash: true
