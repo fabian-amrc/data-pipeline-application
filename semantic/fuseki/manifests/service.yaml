@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: fuseki
+  labels:
+    app.kubernetes.io/name: fuseki
+    app.kubernetes.io/part-of: semantic-layer
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: fuseki
+  ports:
+    - name: http
+      port: 3030
+      targetPort: http

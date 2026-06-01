@@ -1,0 +1,13 @@
+@prefix dpa: <https://data-pipeline.local/ontology/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+
+# Minimal example. Expand as ontology governance matures.
+dpa:DocumentedClassShape
+    a sh:NodeShape ;
+    sh:targetClass rdfs:Class ;
+    sh:property [
+        sh:path rdfs:comment ;
+        sh:minCount 1 ;
+        sh:message "Ontology classes should have an rdfs:comment definition." ;
+    ] .

@@ -41,6 +41,12 @@ Kustomize `helmCharts`, using values files committed alongside each app.
 |  |- kustomization.yaml
 |  |- manifests/
 |  `- values.yaml
+|- semantic/
+|  |- ontology/
+|  |- shapes/
+|  |- mappings/
+|  |- fuseki/
+|  `- projector/
 `- traefik/
    |- app.yaml
    |- kustomization.yaml
@@ -58,6 +64,7 @@ Kustomize `helmCharts`, using values files committed alongside each app.
 | MinIO Tenant | `https://operator.min.io`, chart `tenant` | `7.1.1` |
 | Unity Catalog | Vendored from `https://github.com/unitycatalog/unitycatalog.git`, path `helm` | `v0.3.1` |
 | Traefik | `https://traefik.github.io/charts`, chart `traefik` | `40.2.0` |
+| Apache Jena Fuseki | `stain/jena-fuseki` container image | `5.1.0` |
 
 ## Bootstrap
 
@@ -111,6 +118,8 @@ Argo CD must run Kustomize with Helm enabled. The Argo CD values set
 - Update hostnames, ingress, storage classes, and resource sizing before production use.
 - The MinIO tenant values are intentionally small and suitable for a starting point only.
 - The Spark smoke-test Python script is stored as a `.py` file and generated into a ConfigMap by Kustomize. Spark applications use the local `data-pipeline-spark:3.5.3` image built from `spark/image`.
+
+- The semantic layer under `semantic/` is the source of truth for ontology/RDL, SHACL shapes, and mappings. Fuseki stores/query RDF; Unity Catalog receives projected operational metadata only.
 
 ## Local Dashboard Access
 

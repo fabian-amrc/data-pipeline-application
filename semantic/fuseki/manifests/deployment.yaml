@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fuseki
+  labels:
+    app.kubernetes.io/name: fuseki
+    app.kubernetes.io/part-of: semantic-layer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: fuseki
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: fuseki
+        app.kubernetes.io/part-of: semantic-layer
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - name: fuseki
+          image: stain/jena-fuseki:5.1.0
+          imagePullPolicy: IfNotPresent
+          args:
+            - /jena-fuseki/fuseki-server
+            - --config=/fuseki/config/config.ttl
+          ports:
+            - name: http
+              containerPort: 3030
+          readinessProbe:
+            httpGet:
+              path: /$/ping
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /$/ping
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              memory: 1Gi
+          volumeMounts:
+            - name: config
+              mountPath: /fuseki/config
+              readOnly: true
+            - name: data
+              mountPath: /fuseki/databases
+      volumes:
+        - name: config
+          configMap:
+            name: fuseki-config
+        - name: data
+          persistentVolumeClaim:
+            claimName: fuseki-data

@@ -1,0 +1,15 @@
+@prefix dpa: <https://data-pipeline.local/ontology/> .
+@prefix rr: <http://www.w3.org/ns/r2rml#> .
+@prefix rml: <http://semweb.mmlab.be/ns/rml#> .
+
+# Placeholder example only. Replace with source-specific mappings.
+<#DatasetMapping>
+    a rr:TriplesMap ;
+    rml:logicalSource [
+        rml:source "s3a://example/datasets.csv" ;
+        rml:referenceFormulation <http://semweb.mmlab.be/ns/ql#CSV>
+    ] ;
+    rr:subjectMap [
+        rr:template "https://data-pipeline.local/resource/dataset/{id}" ;
+        rr:class dpa:Dataset
+    ] .

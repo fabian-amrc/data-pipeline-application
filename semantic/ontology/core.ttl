@@ -1,0 +1,19 @@
+@prefix dpa: <https://data-pipeline.local/ontology/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<https://data-pipeline.local/ontology>
+    a owl:Ontology ;
+    dcterms:title "Data Pipeline Reference Data Layer" ;
+    rdfs:comment "Authoritative ontology/RDL for the local data platform." .
+
+dpa:Dataset
+    a owl:Class ;
+    rdfs:label "Dataset" ;
+    rdfs:comment "A governed logical dataset represented operationally in storage, Spark, or Unity Catalog." .
+
+dpa:CatalogProjection
+    a owl:Class ;
+    rdfs:label "Catalog projection" ;
+    rdfs:comment "Metadata derived from the ontology layer and projected into an operational catalog." .
