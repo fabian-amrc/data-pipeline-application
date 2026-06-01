@@ -1,6 +1,6 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: semantic
+  name: fuseki
   annotations:
     argocd.argoproj.io/sync-wave: "20"

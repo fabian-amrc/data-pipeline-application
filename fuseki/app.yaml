@@ -13,7 +13,7 @@ spec:
     path: fuseki
   destination:
     server: https://kubernetes.default.svc
-    namespace: semantic
+    namespace: fuseki
   syncPolicy:
     automated:
       prune: true
