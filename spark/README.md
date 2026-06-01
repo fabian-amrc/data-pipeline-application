@@ -53,7 +53,7 @@ kubectl logs -n spark-jobs -l spark-role=driver
 
 ## Spark configuration precedence
 
-Spark reads `spark-defaults.conf` as defaults only. Values set on a `SparkApplication` under `spec.sparkConf` are submitted as explicit Spark configuration and override matching keys from the image defaults.
+Spark reads `spark-defaults.conf` as defaults only. The local Spark image merges those defaults with the Spark operator generated properties file at container startup. Values set on a `SparkApplication` under `spec.sparkConf` remain in the generated properties file and override matching image defaults.
 
 ## Local Spark image
 

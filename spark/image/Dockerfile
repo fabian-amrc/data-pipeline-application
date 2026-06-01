@@ -32,6 +32,9 @@ ADD https://repo1.maven.org/maven2/io/delta/delta-storage/3.3.0/delta-storage-3.
 
 # Unity Catalog jars
 ADD https://repo1.maven.org/maven2/io/unitycatalog/unitycatalog-spark_2.12/0.2.1/unitycatalog-spark_2.12-0.2.1.jar /opt/bitnami/spark/jars/
+ADD https://repo1.maven.org/maven2/io/unitycatalog/unitycatalog-client/0.2.1/unitycatalog-client-0.2.1.jar /opt/bitnami/spark/jars/
+ADD https://repo1.maven.org/maven2/org/openapitools/jackson-databind-nullable/0.2.6/jackson-databind-nullable-0.2.6.jar /opt/bitnami/spark/jars/
+ADD https://repo1.maven.org/maven2/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar /opt/bitnami/spark/jars/
 
 # Kafka jars
 ADD https://repo1.maven.org/maven2/org/apache/spark/spark-sql-kafka-0-10_2.12/3.5.3/spark-sql-kafka-0-10_2.12-3.5.3.jar /opt/bitnami/spark/jars/
@@ -42,9 +45,11 @@ ADD https://repo1.maven.org/maven2/org/apache/spark/spark-token-provider-kafka-0
 # Apache jars
 ADD https://repo1.maven.org/maven2/org/apache/commons/commons-pool2/2.12.1/commons-pool2-2.12.1.jar /opt/bitnami/spark/jars/
 
-COPY conf/spark-defaults.conf /opt/bitnami/spark/conf/spark-defaults.conf
+COPY conf/spark-defaults.conf /opt/bitnami/spark/conf.default/spark-defaults.conf
+COPY scripts/entrypoint.sh /opt/data-pipeline/entrypoint.sh
 
-RUN chmod -R a+r /opt/bitnami/spark/jars /opt/bitnami/spark/conf/spark-defaults.conf
+RUN chmod -R a+r /opt/bitnami/spark/jars /opt/bitnami/spark/conf.default/spark-defaults.conf \
+  && chmod +x /opt/data-pipeline/entrypoint.sh
 
 WORKDIR /app
 
@@ -60,5 +65,7 @@ ENV USER=spark
 ENV LOGNAME=spark
 ENV SPARK_USER=spark
 ENV HADOOP_USER_NAME=spark
+
+ENTRYPOINT ["/opt/data-pipeline/entrypoint.sh"]
 
 USER 1001
