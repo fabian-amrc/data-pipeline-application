@@ -8,7 +8,8 @@ Input:
 
 - Ontology/RDL Turtle files from `semantic-mapper/ontology`.
 - Mapping files from `semantic-mapper/mappings`.
-- Optional projection rules that map ontology annotations to Unity Catalog fields.
+- SHACL shapes from `semantic-mapper/shapes`.
+- Projection annotations on mappings, starting with `dpa:unityCatalogObject`.
 
 Output:
 
@@ -25,9 +26,9 @@ Processing model:
 
 Deployment model:
 
-- Start as a manually triggered Kubernetes Job.
-- Promote to CronJob only when projection is stable and idempotent.
-- Mount semantic artifacts from a ConfigMap for small MVP content, or read from Git/object storage later.
+- Run as an Argo CD PostSync Kubernetes Job from `semantic-mapper/manifests/job.yaml`.
+- Mount semantic artifacts from Kustomize-generated ConfigMaps for the MVP.
+- Promote to a CronJob only when projection is stable and there is a real need for periodic reconciliation outside GitOps syncs.
 
 Important behavior:
 

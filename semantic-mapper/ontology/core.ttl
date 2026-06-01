@@ -17,3 +17,9 @@ dpa:CatalogProjection
     a owl:Class ;
     rdfs:label "Catalog projection" ;
     rdfs:comment "Metadata derived from the ontology layer and projected into an operational catalog." .
+
+
+dpa:unityCatalogObject
+    a owl:AnnotationProperty ;
+    rdfs:label "Unity Catalog object" ;
+    rdfs:comment "Fully qualified Unity Catalog object name that receives projected semantic metadata." .

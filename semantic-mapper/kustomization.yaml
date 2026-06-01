@@ -1,0 +1,23 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: semantic-mapper
+resources:
+  - manifests/namespace.yaml
+  - manifests/job.yaml
+
+configMapGenerator:
+  - name: semantic-mapper-script
+    files:
+      - semantic_mapper.py=scripts/semantic_mapper.py
+  - name: semantic-ontology
+    files:
+      - core.ttl=ontology/core.ttl
+  - name: semantic-mappings
+    files:
+      - example-dataset.rml.ttl=mappings/rml/example-dataset.rml.ttl
+  - name: semantic-shapes
+    files:
+      - ontology-quality.shacl.ttl=shapes/ontology-quality.shacl.ttl
+
+generatorOptions:
+  disableNameSuffixHash: true

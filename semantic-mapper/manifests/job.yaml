@@ -1,0 +1,67 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: semantic-mapper-sync
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 300
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: semantic-mapper
+        app.kubernetes.io/part-of: semantic-layer
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: semantic-mapper
+          image: python:3.12-slim
+          imagePullPolicy: IfNotPresent
+          command:
+            - python
+            - /app/semantic_mapper.py
+          env:
+            - name: FUSEKI_DATA_URL
+              value: http://fuseki.fuseki.svc.cluster.local:3030/semantic/data
+            - name: FUSEKI_PING_URL
+              value: http://fuseki.fuseki.svc.cluster.local:3030/$/ping
+            - name: ONTOLOGY_GRAPH_IRI
+              value: https://data-pipeline.local/graph/ontology
+            - name: MAPPINGS_GRAPH_IRI
+              value: https://data-pipeline.local/graph/mappings
+            - name: SHAPES_GRAPH_IRI
+              value: https://data-pipeline.local/graph/shapes
+            - name: UNITY_CATALOG_API_URL
+              value: http://unity-catalog-unitycatalog-server.unity-catalog.svc.cluster.local:8080/api/2.1/unity-catalog
+            - name: PROJECT_TO_UNITY_CATALOG
+              value: "true"
+            - name: STRICT_UNITY_CATALOG_PROJECTION
+              value: "false"
+          volumeMounts:
+            - name: script
+              mountPath: /app
+              readOnly: true
+            - name: ontology
+              mountPath: /semantic-mapper/ontology
+              readOnly: true
+            - name: mappings
+              mountPath: /semantic-mapper/mappings
+              readOnly: true
+            - name: shapes
+              mountPath: /semantic-mapper/shapes
+              readOnly: true
+      volumes:
+        - name: script
+          configMap:
+            name: semantic-mapper-script
+        - name: ontology
+          configMap:
+            name: semantic-ontology
+        - name: mappings
+          configMap:
+            name: semantic-mappings
+        - name: shapes
+          configMap:
+            name: semantic-shapes

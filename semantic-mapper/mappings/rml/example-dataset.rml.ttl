@@ -5,6 +5,7 @@
 # Placeholder example only. Replace with source-specific mappings.
 <#DatasetMapping>
     a rr:TriplesMap ;
+    dpa:unityCatalogObject "unity.default.example_dataset" ;
     rml:logicalSource [
         rml:source "s3a://example/datasets.csv" ;
         rml:referenceFormulation <http://semweb.mmlab.be/ns/ql#CSV>

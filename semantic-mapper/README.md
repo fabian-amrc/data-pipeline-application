@@ -14,6 +14,20 @@ semantic-mapper/
 `- projector/            # Metadata projection design and future implementation
 ```
 
+
+## Runtime Workflow
+
+`semantic-mapper` deploys a GitOps-managed sync Job. On each Argo CD sync it:
+
+1. Uploads ontology files to the Fuseki named graph `https://data-pipeline.local/graph/ontology`.
+2. Uploads RML/R2RML mapping files to `https://data-pipeline.local/graph/mappings`.
+3. Uploads SHACL shape files to `https://data-pipeline.local/graph/shapes`.
+4. Reads mapping projection annotations and writes derived comments/properties into Unity Catalog.
+
+The current projection contract is intentionally narrow. A mapping can opt into UC projection with `dpa:unityCatalogObject "catalog.schema.table"`, and the mapper projects metadata from the ontology class referenced by `rr:class`. Unity Catalog remains a projection target; the ontology and mappings remain authoritative.
+
+By default, Unity Catalog projection failures are logged as warnings so missing MVP tables do not block RDF graph publication. Set `STRICT_UNITY_CATALOG_PROJECTION=true` in the Job when failed UC writes should fail the sync.
+
 ## Ownership Boundaries
 
 - Ontology/RDL owns business meaning, classes, properties, definitions, and controlled vocabulary alignment.
