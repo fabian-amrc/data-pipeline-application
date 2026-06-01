@@ -6,8 +6,8 @@ This directory contains the Spark operator deployment and example Spark applicat
 
 - `operator/app.yaml` - Argo CD application for the Spark operator chart
 - `operator/values.yaml` - Helm values used by the Spark operator application
-- `image/Dockerfile` - Local Spark image with shared Kafka, CA certificate setup, and a stable `spark` runtime user
-- `spark-applications/patches/common-spark-conf.yaml` - Shared Spark submit configuration injected into all SparkApplication resources by Kustomize
+- `image/Dockerfile` - Local Spark image with shared Delta, Unity Catalog, Kafka, CA certificate setup, and a stable `spark` runtime user
+- `image/conf/spark-defaults.conf` - Shared Spark defaults baked into the local image; per-application `spec.sparkConf` values override these at submit time
 - `spark-applications/app.yaml` - Argo CD application for SparkApplication resources
 - `spark-applications/applications/spark-pi/spark-pi-sparkapplication.yaml` - Spark Pi sample application for testing
 
@@ -49,7 +49,11 @@ kubectl logs -n spark-jobs -l spark-role=driver
 
 - The sample Spark Pi job uses the `sparkoperator.k8s.io/v1beta2` API.
 - If the operator is not ready, the SparkApplication will remain pending until the CRD is available.
-- Update `spark/image/Dockerfile` for shared Spark dependencies or runtime image setup, `spark-applications/patches/common-spark-conf.yaml` for shared Spark submit configuration, or the individual SparkApplication manifests for per-job image, main class, and resource sizing changes.
+- Update `spark/image/Dockerfile` for shared Spark dependencies or runtime image setup, `spark/image/conf/spark-defaults.conf` for image-level Spark defaults, or the individual SparkApplication manifests for per-job image, `spec.sparkConf`, main class, and resource sizing changes.
+
+## Spark configuration precedence
+
+Spark reads `spark-defaults.conf` as defaults only. Values set on a `SparkApplication` under `spec.sparkConf` are submitted as explicit Spark configuration and override matching keys from the image defaults.
 
 ## Local Spark image
 
