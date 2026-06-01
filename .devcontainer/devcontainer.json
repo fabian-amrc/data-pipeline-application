@@ -16,7 +16,8 @@
         "esbenp.prettier-vscode",
         "github.vscode-github-actions",
         "GitHub.copilot",
-        "openai.chatgpt"
+        "openai.chatgpt",
+        "stardog-union.vscode-langserver-turtle"
       ]
     }
   },
