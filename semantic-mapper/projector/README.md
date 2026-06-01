@@ -6,8 +6,8 @@ The metadata projector reads ontology and mapping artifacts and writes derived m
 
 Input:
 
-- Ontology/RDL Turtle files from `semantic/ontology`.
-- Mapping files from `semantic/mappings`.
+- Ontology/RDL Turtle files from `semantic-mapper/ontology`.
+- Mapping files from `semantic-mapper/mappings`.
 - Optional projection rules that map ontology annotations to Unity Catalog fields.
 
 Output:
