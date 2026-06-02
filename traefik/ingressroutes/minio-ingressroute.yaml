@@ -10,6 +10,6 @@ spec:
     - match: Host(`minio.local`)
       kind: Rule
       services:
-        - name: minio
+        - name: data-pipeline-console
           namespace: minio-tenant
-          port: 9000
+          port: 9090
