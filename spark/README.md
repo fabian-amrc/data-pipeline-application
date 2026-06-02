@@ -11,6 +11,7 @@ This directory contains the Spark operator deployment and example Spark applicat
 - `spark-applications/app.yaml` - Argo CD application for SparkApplication resources
 - `spark-applications/applications/spark-pi/spark-pi-sparkapplication.yaml` - Spark Pi sample application for testing
 - `spark-applications/applications/delta-test/delta-test-sparkapplication.yaml` - Delta Lake and MinIO S3A write/read test
+- `spark-applications/applications/semantic-delta-test/semantic-delta-test-sparkapplication.yaml` - Writes the ontology-mapped `unity.default.example_dataset` Delta table and verifies semantic UC metadata
 
 ## How to test
 

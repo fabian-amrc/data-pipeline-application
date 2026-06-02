@@ -6,8 +6,13 @@
 <#DatasetMapping>
     a rr:TriplesMap ;
     dpa:unityCatalogObject "unity.default.example_dataset" ;
+    dpa:unityCatalogStorageLocation "s3://delta/example-dataset" ;
+    dpa:unityCatalogColumn "id:INT:Dataset identifier" ;
+    dpa:unityCatalogColumn "name:STRING:Display name" ;
+    dpa:unityCatalogColumn "age:INT:Example numeric attribute" ;
+    dpa:unityCatalogColumn "city:STRING:Example city attribute" ;
     rml:logicalSource [
-        rml:source "s3a://example/datasets.csv" ;
+        rml:source "s3a://delta/example-dataset" ;
         rml:referenceFormulation <http://semweb.mmlab.be/ns/ql#CSV>
     ] ;
     rr:subjectMap [

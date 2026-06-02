@@ -23,3 +23,14 @@ dpa:unityCatalogObject
     a owl:AnnotationProperty ;
     rdfs:label "Unity Catalog object" ;
     rdfs:comment "Fully qualified Unity Catalog object name that receives projected semantic metadata." .
+
+
+dpa:unityCatalogStorageLocation
+    a owl:AnnotationProperty ;
+    rdfs:label "Unity Catalog storage location" ;
+    rdfs:comment "External table storage location used when projecting semantic mappings into Unity Catalog." .
+
+dpa:unityCatalogColumn
+    a owl:AnnotationProperty ;
+    rdfs:label "Unity Catalog column" ;
+    rdfs:comment "Column definition for projected Unity Catalog tables, encoded as name:type[:comment]." .

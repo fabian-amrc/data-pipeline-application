@@ -8,7 +8,7 @@ import time
 from pathlib import Path
 from typing import Dict, Iterable, List, Tuple
 from urllib.error import HTTPError, URLError
-from urllib.parse import quote
+from urllib.parse import quote, urlencode
 from urllib.request import Request, urlopen
 
 ONTOLOGY_DIR = Path(os.getenv("ONTOLOGY_DIR", "/semantic-mapper/ontology"))
@@ -36,10 +36,30 @@ LABEL_RE = re.compile(r"rdfs:label\s+\"([^\"]+)\"")
 COMMENT_RE = re.compile(r"rdfs:comment\s+\"([^\"]+)\"")
 RR_CLASS_RE = re.compile(r"rr:class\s+([^\s;\]]+)")
 UC_OBJECT_RE = re.compile(r"dpa:unityCatalogObject\s+\"([^\"]+)\"")
+UC_STORAGE_RE = re.compile(r"dpa:unityCatalogStorageLocation\s+\"([^\"]+)\"")
+UC_COLUMN_RE = re.compile(r"dpa:unityCatalogColumn\s+\"([^\"]+)\"")
+
+UC_TO_SPARK_JSON_TYPE = {
+    "BOOLEAN": "boolean",
+    "BYTE": "byte",
+    "SHORT": "short",
+    "INT": "integer",
+    "LONG": "long",
+    "FLOAT": "float",
+    "DOUBLE": "double",
+    "DATE": "date",
+    "TIMESTAMP": "timestamp",
+    "STRING": "string",
+    "BINARY": "binary",
+}
 
 
 def ttl_files(directory: Path) -> List[Path]:
-    return sorted(p for p in directory.rglob("*.ttl") if p.is_file())
+    return sorted(
+        p
+        for p in directory.rglob("*.ttl")
+        if p.is_file() and not any(part.startswith("..") for part in p.parts)
+    )
 
 
 def read_all(files: Iterable[Path]) -> str:
@@ -67,6 +87,58 @@ def fuseki_headers(content_type: str) -> Dict[str, str]:
         result["Authorization"] = f"Basic {token}"
     return result
 
+
+
+
+def uc_request(path: str, method: str = "GET", payload=None, query=None):
+    url = f"{UNITY_CATALOG_API_URL}{path}"
+    if query:
+        url = f"{url}?{urlencode(query)}"
+    data = None
+    headers = uc_headers("application/json")
+    if payload is not None:
+        data = json.dumps(payload).encode("utf-8")
+    request = Request(url, data=data, method=method, headers=headers)
+    with urlopen(request, timeout=20) as response:
+        body = response.read().decode("utf-8")
+        return response.status, json.loads(body) if body else None
+
+
+def post_if_missing(path: str, payload: Dict[str, object], exists_statuses=(400, 409)) -> None:
+    try:
+        status, _body = uc_request(path, method="POST", payload=payload)
+        print(f"Created Unity Catalog resource at {path}: HTTP {status}")
+    except HTTPError as exc:
+        if exc.code in exists_statuses:
+            exc.read()
+            return
+        raise
+
+
+def get_uc_table(full_name: str):
+    try:
+        _status, table = uc_request(f"/tables/{quote(full_name, safe='')}")
+        return table
+    except HTTPError as exc:
+        exc.read()
+        if exc.code == 404:
+            return None
+        raise
+
+
+def ensure_uc_namespace(catalog_name: str, schema_name: str) -> None:
+    post_if_missing(
+        "/catalogs",
+        {"name": catalog_name, "comment": "Local semantic mapper catalog"},
+    )
+    post_if_missing(
+        "/schemas",
+        {
+            "name": schema_name,
+            "catalog_name": catalog_name,
+            "comment": "Local semantic mapper schema",
+        },
+    )
 
 def wait_for(url: str, attempts: int = 30, delay: float = 2.0) -> None:
     last_error = None
@@ -139,45 +211,123 @@ def parse_ontology_classes(files: List[Path]) -> Dict[str, Dict[str, str]]:
     return classes
 
 
-def parse_mapping_projections(files: List[Path]) -> List[Tuple[str, str]]:
+def parse_uc_columns(statement: str) -> List[Dict[str, object]]:
+    columns = []
+    for position, raw_column in enumerate(UC_COLUMN_RE.findall(statement)):
+        parts = [part.strip() for part in raw_column.split(":", 2)]
+        if len(parts) < 2:
+            raise ValueError(f"Invalid dpa:unityCatalogColumn value: {raw_column}")
+        name, type_name = parts[0], parts[1].upper()
+        comment = parts[2] if len(parts) == 3 else ""
+        spark_type = UC_TO_SPARK_JSON_TYPE.get(type_name)
+        if not spark_type:
+            raise ValueError(f"Unsupported dpa:unityCatalogColumn type: {type_name}")
+        columns.append(
+            {
+                "name": name,
+                "type_text": type_name,
+                "type_json": json.dumps(
+                    {
+                        "name": name,
+                        "type": spark_type,
+                        "nullable": True,
+                        "metadata": {},
+                    },
+                    separators=(",", ":"),
+                ),
+                "type_name": type_name,
+                "position": position,
+                "nullable": True,
+                "comment": comment,
+            }
+        )
+    return columns
+
+
+def parse_mapping_projections(files: List[Path]) -> List[Dict[str, object]]:
     projections = []
     text = read_all(files)
     prefixes = parse_prefixes(text)
     for statement in statements(text):
         uc_object = UC_OBJECT_RE.search(statement)
         rr_class = RR_CLASS_RE.search(statement)
+        storage_location = UC_STORAGE_RE.search(statement)
         if not uc_object or not rr_class:
             continue
-        projections.append((uc_object.group(1), expand_term(rr_class.group(1), prefixes)))
+        projections.append(
+            {
+                "full_name": uc_object.group(1),
+                "class_iri": expand_term(rr_class.group(1), prefixes),
+                "storage_location": storage_location.group(1) if storage_location else "",
+                "columns": parse_uc_columns(statement),
+            }
+        )
     return projections
 
 
-def patch_uc_table(full_name: str, class_iri: str, class_metadata: Dict[str, str]) -> None:
-    payload = {
-        "comment": class_metadata.get("comment") or class_metadata.get("label") or class_iri,
-        "properties": {
-            "semantic.class": class_iri,
-            "semantic.label": class_metadata.get("label", ""),
-            "semantic.source": "semantic-mapper",
-        },
+def create_or_verify_uc_table(projection: Dict[str, object], class_metadata: Dict[str, str]) -> None:
+    full_name = str(projection["full_name"])
+    class_iri = str(projection["class_iri"])
+    storage_location = str(projection.get("storage_location") or "")
+    columns = list(projection.get("columns") or [])
+
+    if not storage_location or not columns:
+        raise ValueError(
+            f"Projection for {full_name} requires dpa:unityCatalogStorageLocation "
+            "and at least one dpa:unityCatalogColumn."
+        )
+
+    name_parts = full_name.split(".")
+    if len(name_parts) != 3:
+        raise ValueError(f"Unity Catalog object must be catalog.schema.table: {full_name}")
+    catalog_name, schema_name, table_name = name_parts
+    ensure_uc_namespace(catalog_name, schema_name)
+
+    semantic_properties = {
+        "semantic.class": class_iri,
+        "semantic.label": class_metadata.get("label", ""),
+        "semantic.source": "semantic-mapper",
     }
-    encoded_name = quote(full_name, safe="")
-    url = f"{UNITY_CATALOG_API_URL}/tables/{encoded_name}"
-    request = Request(url, data=json.dumps(payload).encode("utf-8"), method="PATCH", headers=uc_headers("application/json"))
+    existing = get_uc_table(full_name)
+    if existing:
+        existing_properties = existing.get("properties") or {}
+        missing = {
+            key: value
+            for key, value in semantic_properties.items()
+            if existing_properties.get(key) != value
+        }
+        if missing:
+            message = (
+                f"Unity Catalog table {full_name} already exists but cannot be updated "
+                f"by this UC server. Missing/mismatched semantic properties: {missing}"
+            )
+            if STRICT_UC:
+                raise RuntimeError(message)
+            print(f"WARNING: {message}")
+        else:
+            print(f"Verified semantic metadata on UC table {full_name}")
+        return
+
+    payload = {
+        "name": table_name,
+        "catalog_name": catalog_name,
+        "schema_name": schema_name,
+        "table_type": "EXTERNAL",
+        "data_source_format": "DELTA",
+        "columns": columns,
+        "storage_location": storage_location,
+        "comment": class_metadata.get("comment") or class_metadata.get("label") or class_iri,
+        "properties": semantic_properties,
+    }
     try:
-        with urlopen(request, timeout=20) as response:
-            print(f"Projected semantic metadata to UC table {full_name}: HTTP {response.status}")
+        status, _table = uc_request("/tables", method="POST", payload=payload)
+        print(f"Projected semantic metadata by creating UC table {full_name}: HTTP {status}")
     except HTTPError as exc:
         message = exc.read().decode("utf-8", errors="replace")
-        text = f"Unity Catalog projection failed for {full_name}: HTTP {exc.code} {message}"
-        if STRICT_UC:
-            raise RuntimeError(text) from exc
-        print(f"WARNING: {text}")
-    except (URLError, TimeoutError) as exc:
-        text = f"Unity Catalog projection failed for {full_name}: {exc}"
-        if STRICT_UC:
-            raise RuntimeError(text) from exc
-        print(f"WARNING: {text}")
+        raise RuntimeError(
+            f"Unity Catalog table creation failed for {full_name}: "
+            f"HTTP {exc.code} {message}"
+        ) from exc
 
 
 def project_to_unity_catalog(ontology_files: List[Path], mapping_files: List[Path]) -> None:
@@ -187,9 +337,10 @@ def project_to_unity_catalog(ontology_files: List[Path], mapping_files: List[Pat
         print("No mapping projections found. Add dpa:unityCatalogObject to a TriplesMap to enable UC projection.")
         return
     print(f"Found {len(projections)} Unity Catalog projection target(s)")
-    for full_name, class_iri in projections:
+    for projection in projections:
+        class_iri = str(projection["class_iri"])
         metadata = classes.get(class_iri, {"label": class_iri, "comment": ""})
-        patch_uc_table(full_name, class_iri, metadata)
+        create_or_verify_uc_table(projection, metadata)
 
 
 def main() -> int:
