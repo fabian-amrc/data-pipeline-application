@@ -7,7 +7,7 @@ This directory contains the Spark operator deployment and example Spark applicat
 - `operator/app.yaml` - Argo CD application for the Spark operator chart
 - `operator/values.yaml` - Helm values used by the Spark operator application
 - `image/Dockerfile` - Local Spark image with shared Delta, Unity Catalog, Kafka, CA certificate setup, and a stable `spark` runtime user
-- `image/conf/spark-defaults.conf` - Shared Spark defaults baked into the local image; per-application `spec.sparkConf` values override these at submit time
+- `image/conf/spark-defaults.conf` - Shared Spark defaults baked into the local image, including Delta, Unity Catalog, and MinIO S3A defaults; per-application `spec.sparkConf` values override these at submit time
 - `spark-applications/app.yaml` - Argo CD application for SparkApplication resources
 - `spark-applications/applications/spark-pi/spark-pi-sparkapplication.yaml` - Spark Pi sample application for testing
 - `spark-applications/applications/delta-test/delta-test-sparkapplication.yaml` - Delta Lake and MinIO S3A write/read test
@@ -44,7 +44,7 @@ kubectl get pods -n spark-jobs
 kubectl logs -n spark-jobs -l spark-role=driver
 ```
 
-6. The Delta test writes a small table to `s3a://delta/delta-test`, reads it back, and prints the resulting rows. It defaults to the in-cluster MinIO endpoint and reads credentials from a `myminio-env-configuration` secret in the `spark-jobs` namespace with the same `config.env` key used by the MinIO tenant. Override `MINIO_ENDPOINT` or `OUTPUT_PATH` in `spark/spark-applications/applications/delta-test/delta-test-sparkapplication.yaml` if your tenant uses different values.
+6. The Delta test writes a small table to `s3a://delta/delta-test`, reads it back, and prints the resulting rows. The Spark image provides the default in-cluster MinIO S3A configuration, and the application reads credentials from a `myminio-env-configuration` secret in the `spark-jobs` namespace with the same `config.env` key used by the MinIO tenant. Override `OUTPUT_PATH` in `spark/spark-applications/applications/delta-test/delta-test-sparkapplication.yaml`, or override `spark.hadoop.fs.s3a.endpoint` in `spec.sparkConf`, if your tenant uses different values.
 
 7. If you want Spark UI access, expose the driver web UI or deploy a Spark History Server.
    - The current sample is primarily a functional test of the operator.
@@ -57,7 +57,7 @@ kubectl logs -n spark-jobs -l spark-role=driver
 
 ## Spark configuration precedence
 
-Spark reads `spark-defaults.conf` as defaults only. The local Spark image merges those defaults with the Spark operator generated properties file at container startup. Values set on a `SparkApplication` under `spec.sparkConf` remain in the generated properties file and override matching image defaults.
+Spark reads `spark-defaults.conf` as defaults only. The local Spark image merges those defaults with the Spark operator generated properties file at container startup. Values set on a `SparkApplication` under `spec.sparkConf` remain in the generated properties file and override matching image defaults. The image entrypoint also reads `MINIO_CONFIG_ENV_FILE`, when mounted, and exports AWS credentials so the shared S3A environment-variable credential provider works for drivers and executors.
 
 ## Local Spark image
 

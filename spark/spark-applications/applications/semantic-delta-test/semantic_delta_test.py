@@ -2,7 +2,7 @@ import json
 
 from pyspark.sql import SparkSession
 
-from minio_s3 import configure_s3a, create_bucket_if_missing
+from minio_s3 import create_bucket_if_missing
 from sample_dataset import create_example_dataset
 from semantic_delta_config import load_settings
 from semantic_uc import get_uc_table, verify_semantic_table
@@ -20,8 +20,6 @@ def main():
 
     spark = SparkSession.builder.appName("semantic-delta-test").getOrCreate()
     try:
-        configure_s3a(spark, settings.endpoint, settings.access_key, settings.secret_key)
-
         df = create_example_dataset(spark)
         print("Writing ontology-mapped Delta table to:", settings.output_path)
         df.show(truncate=False)

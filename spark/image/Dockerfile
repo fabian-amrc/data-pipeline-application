@@ -69,6 +69,9 @@ ENV USER=spark
 ENV LOGNAME=spark
 ENV SPARK_USER=spark
 ENV HADOOP_USER_NAME=spark
+ENV MINIO_ENDPOINT=http://data-pipeline-hl.minio-tenant.svc.cluster.local:9000
+ENV AWS_REGION=us-east-1
+ENV AWS_DEFAULT_REGION=us-east-1
 
 ENTRYPOINT ["/opt/data-pipeline/entrypoint.sh"]
 

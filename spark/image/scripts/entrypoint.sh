@@ -4,6 +4,38 @@ set -euo pipefail
 DEFAULTS_FILE="/opt/bitnami/spark/conf.default/spark-defaults.conf"
 ORIGINAL_ENTRYPOINT="/opt/bitnami/scripts/spark/entrypoint.sh"
 
+
+load_minio_credentials() {
+  local env_file="${MINIO_CONFIG_ENV_FILE:-}"
+
+  if [ -z "${env_file}" ] || [ ! -f "${env_file}" ]; then
+    return 0
+  fi
+
+  local minio_user=""
+  local minio_password=""
+  while IFS= read -r line; do
+    case "${line}" in
+      export\ MINIO_ROOT_USER=*)
+        minio_user="${line#export MINIO_ROOT_USER=}"
+        ;;
+      export\ MINIO_ROOT_PASSWORD=*)
+        minio_password="${line#export MINIO_ROOT_PASSWORD=}"
+        ;;
+    esac
+  done < "${env_file}"
+
+  minio_user="${minio_user%\"}"
+  minio_user="${minio_user#\"}"
+  minio_password="${minio_password%\"}"
+  minio_password="${minio_password#\"}"
+
+  export AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID:-${MINIO_ACCESS_KEY:-${minio_user}}}"
+  export AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY:-${MINIO_SECRET_KEY:-${minio_password}}}"
+  export AWS_REGION="${AWS_REGION:-us-east-1}"
+  export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-${AWS_REGION}}"
+}
+
 merge_spark_properties() {
   local properties_file="$1"
 
@@ -38,6 +70,8 @@ merge_spark_properties() {
   cat "${properties_file}" >> "${merged_file}"
   printf '%s' "${merged_file}"
 }
+
+load_minio_credentials
 
 if [ "$#" -gt 0 ] && [ "$1" = "driver" ]; then
   args=("$@")

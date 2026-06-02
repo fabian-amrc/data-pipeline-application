@@ -107,20 +107,6 @@ def create_bucket_if_missing(endpoint, access_key, secret_key, bucket, region):
         ) from error
 
 
-def configure_s3a(spark, endpoint, access_key, secret_key):
-    hadoop_conf = spark.sparkContext._jsc.hadoopConfiguration()
-    hadoop_conf.set("fs.s3a.endpoint", endpoint)
-    hadoop_conf.set("fs.s3a.access.key", access_key)
-    hadoop_conf.set("fs.s3a.secret.key", secret_key)
-    hadoop_conf.set("fs.s3a.path.style.access", "true")
-    hadoop_conf.set("fs.s3a.connection.ssl.enabled", str(endpoint.startswith("https")).lower())
-    hadoop_conf.set("fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
-    hadoop_conf.set(
-        "fs.s3a.aws.credentials.provider",
-        "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider",
-    )
-
-
 output_path = os.getenv("OUTPUT_PATH", DEFAULT_OUTPUT_PATH)
 endpoint = os.getenv("MINIO_ENDPOINT", DEFAULT_ENDPOINT)
 minio_env = load_minio_env_file(os.getenv("MINIO_CONFIG_ENV_FILE"))
@@ -147,8 +133,6 @@ if not bucket:
 create_bucket_if_missing(endpoint, access_key, secret_key, bucket, region)
 
 spark = SparkSession.builder.appName("delta-minio-test").getOrCreate()
-configure_s3a(spark, endpoint, access_key, secret_key)
-
 schema = StructType(
     [
         StructField("id", IntegerType(), True),

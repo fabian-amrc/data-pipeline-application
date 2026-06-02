@@ -10,13 +10,6 @@ spec:
   imagePullPolicy: IfNotPresent
   mainApplicationFile: local:///app/delta_test.py
   sparkVersion: "3.5.3"
-  sparkConf:
-    spark.delta.logStore.class: org.apache.spark.sql.delta.storage.S3SingleDriverLogStore
-    spark.hadoop.fs.s3a.impl: org.apache.hadoop.fs.s3a.S3AFileSystem
-    spark.hadoop.fs.s3a.endpoint: http://data-pipeline-hl.minio-tenant.svc.cluster.local:9000
-    spark.hadoop.fs.s3a.path.style.access: "true"
-    spark.hadoop.fs.s3a.connection.ssl.enabled: "false"
-    spark.hadoop.fs.s3a.aws.credentials.provider: org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider
   restartPolicy:
     type: Never
   volumes:
@@ -34,8 +27,6 @@ spec:
       version: 3.5.3
     serviceAccount: spark-operator-spark
     env:
-      - name: MINIO_ENDPOINT
-        value: http://data-pipeline-hl.minio-tenant.svc.cluster.local:9000
       - name: OUTPUT_PATH
         value: s3a://delta/delta-test
       - name: MINIO_CONFIG_ENV_FILE
@@ -55,8 +46,6 @@ spec:
     labels:
       version: 3.5.3
     env:
-      - name: MINIO_ENDPOINT
-        value: http://data-pipeline-hl.minio-tenant.svc.cluster.local:9000
       - name: OUTPUT_PATH
         value: s3a://delta/delta-test
       - name: MINIO_CONFIG_ENV_FILE

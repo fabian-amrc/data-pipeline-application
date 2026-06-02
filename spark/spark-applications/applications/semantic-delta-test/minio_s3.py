@@ -98,17 +98,3 @@ def create_bucket_if_missing(endpoint, access_key, secret_key, bucket, region):
         raise RuntimeError(
             f"Could not create bucket {bucket}: HTTP {error.code} {body}"
         ) from error
-
-
-def configure_s3a(spark, endpoint, access_key, secret_key):
-    hadoop_conf = spark.sparkContext._jsc.hadoopConfiguration()
-    hadoop_conf.set("fs.s3a.endpoint", endpoint)
-    hadoop_conf.set("fs.s3a.access.key", access_key)
-    hadoop_conf.set("fs.s3a.secret.key", secret_key)
-    hadoop_conf.set("fs.s3a.path.style.access", "true")
-    hadoop_conf.set("fs.s3a.connection.ssl.enabled", str(endpoint.startswith("https")).lower())
-    hadoop_conf.set("fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
-    hadoop_conf.set(
-        "fs.s3a.aws.credentials.provider",
-        "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider",
-    )
