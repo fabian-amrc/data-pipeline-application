@@ -83,6 +83,27 @@ wait_for_control_plane() {
   return 1
 }
 
+ensure_existing_kind_cluster() {
+  local node_name
+  node_name="${CLUSTER_NAME}-control-plane"
+
+  if docker ps --format '{{.Names}}' | grep -qx "${node_name}"; then
+    wait_for_control_plane
+    return 0
+  fi
+
+  if docker ps -a --format '{{.Names}}' | grep -qx "${node_name}"; then
+    echo "Starting stopped kind control plane: ${node_name}"
+    docker start "${node_name}" >/dev/null
+    wait_for_control_plane
+    return 0
+  fi
+
+  echo "kind reports cluster ${CLUSTER_NAME}, but ${node_name} does not exist." >&2
+  echo "Delete the stale cluster with: kind delete cluster --name ${CLUSTER_NAME}" >&2
+  return 1
+}
+
 recover_kind_create() {
   local node_name
   node_name="${CLUSTER_NAME}-control-plane"
@@ -116,6 +137,7 @@ fi
 
 if kind get clusters | grep -qx "${CLUSTER_NAME}"; then
   echo "Using existing kind cluster: ${CLUSTER_NAME}"
+  ensure_existing_kind_cluster
   export_internal_kubeconfig
 else
   echo "Creating kind cluster: ${CLUSTER_NAME}"
