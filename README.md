@@ -49,11 +49,11 @@ Kustomize `helmCharts`, using values files committed alongside each app.
 |- semantic-mapper/
 |  |- app.yaml
 |  |- kustomization.yaml
+|  |- mapper/
+|  |  `- lib/
 |  |- ontology/
 |  |- shapes/
-|  |- mappings/
-|  |- projector/
-|  `- scripts/
+|  `- mappings/
 `- traefik/
    |- app.yaml
    |- kustomization.yaml

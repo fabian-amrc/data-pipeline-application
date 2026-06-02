@@ -44,8 +44,8 @@ spec:
         value: /var/run/minio-tenant/config.env
     volumeMounts:
       - name: semantic-delta-test-script
-        mountPath: /app/semantic_delta_test.py
-        subPath: semantic_delta_test.py
+        mountPath: /app
+        readOnly: true
       - name: minio-tenant-env
         mountPath: /var/run/minio-tenant/config.env
         subPath: config.env
@@ -67,8 +67,8 @@ spec:
         value: /var/run/minio-tenant/config.env
     volumeMounts:
       - name: semantic-delta-test-script
-        mountPath: /app/semantic_delta_test.py
-        subPath: semantic_delta_test.py
+        mountPath: /app
+        readOnly: true
       - name: minio-tenant-env
         mountPath: /var/run/minio-tenant/config.env
         subPath: config.env

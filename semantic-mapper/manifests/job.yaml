@@ -63,6 +63,21 @@ spec:
         - name: script
           configMap:
             name: semantic-mapper-script
+            items:
+              - key: semantic_mapper.py
+                path: semantic_mapper.py
+              - key: semantic_lib_init.py
+                path: lib/__init__.py
+              - key: semantic_config.py
+                path: lib/semantic_config.py
+              - key: semantic_files.py
+                path: lib/semantic_files.py
+              - key: semantic_fuseki.py
+                path: lib/semantic_fuseki.py
+              - key: semantic_rdf.py
+                path: lib/semantic_rdf.py
+              - key: semantic_unity_catalog.py
+                path: lib/semantic_unity_catalog.py
         - name: ontology
           configMap:
             name: semantic-ontology

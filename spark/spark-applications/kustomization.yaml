@@ -13,6 +13,10 @@ configMapGenerator:
   - name: semantic-delta-test-script
     files:
       - semantic_delta_test.py=applications/semantic-delta-test/semantic_delta_test.py
+      - semantic_delta_config.py=applications/semantic-delta-test/semantic_delta_config.py
+      - minio_s3.py=applications/semantic-delta-test/minio_s3.py
+      - sample_dataset.py=applications/semantic-delta-test/sample_dataset.py
+      - semantic_uc.py=applications/semantic-delta-test/semantic_uc.py
   - name: uc-smoke-test-script
     files:
       - uc_smoke_test.py=applications/uc-smoke-test/uc_smoke_test.py

@@ -9,7 +9,13 @@ resources:
 configMapGenerator:
   - name: semantic-mapper-script
     files:
-      - semantic_mapper.py=scripts/semantic_mapper.py
+      - semantic_mapper.py=mapper/semantic_mapper.py
+      - semantic_lib_init.py=mapper/lib/__init__.py
+      - semantic_config.py=mapper/lib/semantic_config.py
+      - semantic_files.py=mapper/lib/semantic_files.py
+      - semantic_fuseki.py=mapper/lib/semantic_fuseki.py
+      - semantic_rdf.py=mapper/lib/semantic_rdf.py
+      - semantic_unity_catalog.py=mapper/lib/semantic_unity_catalog.py
   - name: semantic-ontology
     files:
       - core.ttl=ontology/core.ttl
