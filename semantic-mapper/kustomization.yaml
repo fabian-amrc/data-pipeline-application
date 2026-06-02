@@ -4,6 +4,7 @@ namespace: semantic-mapper
 resources:
   - manifests/namespace.yaml
   - manifests/job.yaml
+  - manifests/fuseki-admin-secret.yaml
 
 configMapGenerator:
   - name: semantic-mapper-script

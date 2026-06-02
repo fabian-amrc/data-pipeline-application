@@ -47,3 +47,7 @@ Run validation before merging ontology or mapping changes:
 3. Validate RML/R2RML mapping syntax and check that mapping predicates/classes resolve to ontology IRIs.
 4. Generate a metadata projection diff for Unity Catalog and review it before applying.
 5. Apply through GitOps after review.
+
+## Fuseki Credentials
+
+`manifests/fuseki-admin-secret.yaml` mirrors the Fuseki admin password into the `semantic-mapper` namespace for local development. Keep it in sync with `fuseki/manifests/fuseki-admin-secret.yaml`; replace both plaintext Secrets with Sealed Secrets, SOPS, External Secrets, or workload identity before using this pattern outside a local/dev cluster.

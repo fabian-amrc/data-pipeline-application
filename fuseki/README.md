@@ -13,3 +13,7 @@ fuseki/
 |- config/config.ttl     # Fuseki assembler configuration
 `- manifests/            # Namespace, PVC, Deployment, Service
 ```
+
+## Admin Secret
+
+`manifests/fuseki-admin-secret.yaml` is Git-managed for local development so Fuseki and the semantic mapper share a stable admin password. Replace this plaintext Secret with Sealed Secrets, SOPS, External Secrets, or workload identity before using this pattern outside a local/dev cluster.

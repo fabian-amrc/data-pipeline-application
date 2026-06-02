@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import base64
 import json
 import os
 import re
@@ -16,6 +17,8 @@ SHAPES_DIR = Path(os.getenv("SHAPES_DIR", "/semantic-mapper/shapes"))
 
 FUSEKI_DATA_URL = os.getenv("FUSEKI_DATA_URL", "http://fuseki.fuseki.svc.cluster.local:3030/semantic/data")
 FUSEKI_PING_URL = os.getenv("FUSEKI_PING_URL", "http://fuseki.fuseki.svc.cluster.local:3030/$/ping")
+FUSEKI_USERNAME = os.getenv("FUSEKI_USERNAME", "admin")
+FUSEKI_PASSWORD = os.getenv("FUSEKI_PASSWORD")
 UNITY_CATALOG_API_URL = os.getenv("UNITY_CATALOG_API_URL", "http://unity-catalog-unitycatalog-server.unity-catalog.svc.cluster.local:8080/api/2.1/unity-catalog")
 
 GRAPH_TARGETS = [
@@ -48,11 +51,20 @@ def read_all(files: Iterable[Path]) -> str:
     return "".join(chunks)
 
 
-def headers(content_type: str) -> Dict[str, str]:
+def uc_headers(content_type: str) -> Dict[str, str]:
     result = {"Content-Type": content_type}
     token = os.getenv("UNITY_CATALOG_BEARER_TOKEN")
     if token:
         result["Authorization"] = f"Bearer {token}"
+    return result
+
+
+def fuseki_headers(content_type: str) -> Dict[str, str]:
+    result = {"Content-Type": content_type}
+    if FUSEKI_PASSWORD:
+        credentials = f"{FUSEKI_USERNAME}:{FUSEKI_PASSWORD}".encode("utf-8")
+        token = base64.b64encode(credentials).decode("ascii")
+        result["Authorization"] = f"Basic {token}"
     return result
 
 
@@ -77,7 +89,7 @@ def put_named_graph(label: str, files: List[Path], graph_iri: str) -> None:
         return
     body = read_all(files).encode("utf-8")
     url = f"{FUSEKI_DATA_URL}?graph={quote(graph_iri, safe='')}"
-    request = Request(url, data=body, method="PUT", headers={"Content-Type": "text/turtle"})
+    request = Request(url, data=body, method="PUT", headers=fuseki_headers("text/turtle"))
     with urlopen(request, timeout=30) as response:
         print(f"Uploaded {len(files)} {label} file(s) to {graph_iri}: HTTP {response.status}")
 
@@ -151,7 +163,7 @@ def patch_uc_table(full_name: str, class_iri: str, class_metadata: Dict[str, str
     }
     encoded_name = quote(full_name, safe="")
     url = f"{UNITY_CATALOG_API_URL}/tables/{encoded_name}"
-    request = Request(url, data=json.dumps(payload).encode("utf-8"), method="PATCH", headers=headers("application/json"))
+    request = Request(url, data=json.dumps(payload).encode("utf-8"), method="PATCH", headers=uc_headers("application/json"))
     try:
         with urlopen(request, timeout=20) as response:
             print(f"Projected semantic metadata to UC table {full_name}: HTTP {response.status}")

@@ -27,6 +27,13 @@ spec:
               value: http://fuseki.fuseki.svc.cluster.local:3030/semantic/data
             - name: FUSEKI_PING_URL
               value: http://fuseki.fuseki.svc.cluster.local:3030/$/ping
+            - name: FUSEKI_USERNAME
+              value: admin
+            - name: FUSEKI_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: fuseki-admin
+                  key: password
             - name: ONTOLOGY_GRAPH_IRI
               value: https://data-pipeline.local/graph/ontology
             - name: MAPPINGS_GRAPH_IRI

@@ -27,6 +27,12 @@ spec:
           args:
             - /jena-fuseki/fuseki-server
             - --config=/fuseki/config/config.ttl
+          env:
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: fuseki-admin
+                  key: password
           ports:
             - name: http
               containerPort: 3030
