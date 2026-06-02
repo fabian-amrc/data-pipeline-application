@@ -1,3 +1,10 @@
+"""Lightweight Turtle parsers for semantic mapper projection metadata.
+
+The mapper only needs a narrow subset of RDF/Turtle syntax: prefixes, ontology
+class labels/comments, and RML triples-map annotations that describe Unity
+Catalog projection targets. These helpers keep that extraction dependency-free.
+"""
+
 import json
 import re
 from pathlib import Path
@@ -31,10 +38,14 @@ UC_TO_SPARK_JSON_TYPE = {
 
 
 def parse_prefixes(text: str) -> Dict[str, str]:
+    """Extract Turtle `@prefix` declarations as prefix-to-IRI mappings."""
+
     return dict(PREFIX_RE.findall(text))
 
 
 def expand_term(term: str, prefixes: Dict[str, str]) -> str:
+    """Expand an RDF term from QName or angle-bracket form into an IRI."""
+
     term = term.strip()
     if term.startswith("<") and term.endswith(">"):
         return term[1:-1]
@@ -46,6 +57,8 @@ def expand_term(term: str, prefixes: Dict[str, str]) -> str:
 
 
 def statements(text: str) -> Iterable[str]:
+    """Yield simple Turtle statements by accumulating lines until a period."""
+
     current = []
     for line in text.splitlines():
         stripped = line.strip()
@@ -58,6 +71,8 @@ def statements(text: str) -> Iterable[str]:
 
 
 def parse_ontology_classes(files: List[Path]) -> Dict[str, Dict[str, str]]:
+    """Return ontology class metadata keyed by expanded class IRI."""
+
     text = read_all(files)
     prefixes = parse_prefixes(text)
     classes: Dict[str, Dict[str, str]] = {}
@@ -76,6 +91,8 @@ def parse_ontology_classes(files: List[Path]) -> Dict[str, Dict[str, str]]:
 
 
 def parse_uc_columns(statement: str) -> List[Dict[str, object]]:
+    """Parse `dpa:unityCatalogColumn` annotations into UC column payloads."""
+
     columns = []
     for position, raw_column in enumerate(UC_COLUMN_RE.findall(statement)):
         parts = [part.strip() for part in raw_column.split(":", 2)]
@@ -111,6 +128,8 @@ def parse_uc_columns(statement: str) -> List[Dict[str, object]]:
 
 
 def parse_mapping_projections(files: List[Path]) -> List[Dict[str, object]]:
+    """Extract Unity Catalog projection targets from RML mapping files."""
+
     projections = []
     text = read_all(files)
     prefixes = parse_prefixes(text)

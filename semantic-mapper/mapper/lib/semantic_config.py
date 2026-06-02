@@ -1,3 +1,10 @@
+"""Configuration loading for the semantic mapper job.
+
+The mapper is configured through environment variables so the same container can
+run locally or in Kubernetes with different Fuseki, Unity Catalog, and graph
+locations.
+"""
+
 import os
 from dataclasses import dataclass
 from pathlib import Path
@@ -6,6 +13,8 @@ from typing import List
 
 @dataclass(frozen=True)
 class GraphTarget:
+    """A directory of Turtle files and the named graph IRI they populate."""
+
     label: str
     directory: Path
     graph_iri: str
@@ -13,6 +22,8 @@ class GraphTarget:
 
 @dataclass(frozen=True)
 class SemanticMapperSettings:
+    """Resolved runtime settings for Fuseki upload and UC projection."""
+
     fuseki_data_url: str
     fuseki_ping_url: str
     fuseki_username: str
@@ -24,11 +35,15 @@ class SemanticMapperSettings:
 
 
 def env_flag(name: str, default: bool) -> bool:
+    """Read a boolean environment variable using lowercase `true` as truthy."""
+
     default_text = "true" if default else "false"
     return os.getenv(name, default_text).lower() == "true"
 
 
 def load_settings() -> SemanticMapperSettings:
+    """Build mapper settings from environment variables and local defaults."""
+
     ontology_dir = Path(os.getenv("ONTOLOGY_DIR", "/semantic-mapper/ontology"))
     mappings_dir = Path(os.getenv("MAPPINGS_DIR", "/semantic-mapper/mappings"))
     shapes_dir = Path(os.getenv("SHAPES_DIR", "/semantic-mapper/shapes"))

@@ -35,6 +35,9 @@ spec:
       - name: delta-test-script
         mountPath: /app/delta_test.py
         subPath: delta_test.py
+      - name: delta-test-script
+        mountPath: /app/minio_s3.py
+        subPath: minio_s3.py
       - name: minio-tenant-env
         mountPath: /var/run/minio-tenant/config.env
         subPath: config.env
@@ -54,6 +57,9 @@ spec:
       - name: delta-test-script
         mountPath: /app/delta_test.py
         subPath: delta_test.py
+      - name: delta-test-script
+        mountPath: /app/minio_s3.py
+        subPath: minio_s3.py
       - name: minio-tenant-env
         mountPath: /var/run/minio-tenant/config.env
         subPath: config.env

@@ -1,3 +1,5 @@
+"""HTTP client helpers for loading semantic graphs into Apache Jena Fuseki."""
+
 import base64
 import time
 from pathlib import Path
@@ -10,13 +12,19 @@ from lib.semantic_files import read_all
 
 
 class FusekiClient:
+    """Small standard-library client for the Fuseki graph store endpoint."""
+
     def __init__(self, data_url: str, ping_url: str, username: str, password: str):
+        """Store Fuseki endpoint URLs and optional basic-auth credentials."""
+
         self.data_url = data_url
         self.ping_url = ping_url
         self.username = username
         self.password = password
 
     def headers(self, content_type: str) -> Dict[str, str]:
+        """Build request headers, adding basic auth when a password is configured."""
+
         result = {"Content-Type": content_type}
         if self.password:
             credentials = f"{self.username}:{self.password}".encode("utf-8")
@@ -25,6 +33,8 @@ class FusekiClient:
         return result
 
     def wait_until_ready(self, attempts: int = 30, delay: float = 2.0) -> None:
+        """Poll the Fuseki ping URL until the service accepts HTTP requests."""
+
         last_error = None
         for attempt in range(1, attempts + 1):
             try:
@@ -39,6 +49,8 @@ class FusekiClient:
         raise RuntimeError(f"Timed out waiting for {self.ping_url}: {last_error}")
 
     def put_named_graph(self, label: str, files: List[Path], graph_iri: str) -> None:
+        """Upload Turtle files to one named graph with a SPARQL Graph Store PUT."""
+
         if not files:
             print(f"No {label} files found; skipping graph upload")
             return

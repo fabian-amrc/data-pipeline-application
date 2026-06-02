@@ -1,3 +1,5 @@
+"""Sample ontology-aligned dataset used by the semantic Delta SparkApplication."""
+
 from pyspark.sql.types import IntegerType, StringType, StructField, StructType
 
 
@@ -19,4 +21,6 @@ DATA = [
 
 
 def create_example_dataset(spark):
+    """Create the semantic test DataFrame with the fixed schema and rows."""
+
     return spark.createDataFrame(DATA, SCHEMA)

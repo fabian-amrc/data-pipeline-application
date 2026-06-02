@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+"""Load semantic RDF into Fuseki and optionally project metadata into UC."""
+
 import sys
 
 from lib.semantic_config import load_settings
@@ -8,6 +10,8 @@ from lib.semantic_unity_catalog import UnityCatalogClient, project_to_unity_cata
 
 
 def main() -> int:
+    """Run the semantic mapper workflow and return a process exit code."""
+
     settings = load_settings()
     fuseki = FusekiClient(
         settings.fuseki_data_url,

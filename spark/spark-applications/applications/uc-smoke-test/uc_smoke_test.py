@@ -1,3 +1,5 @@
+"""SparkApplication script that smoke-tests Spark connectivity to Unity Catalog."""
+
 import json
 import urllib.error
 import urllib.request
@@ -6,6 +8,8 @@ from pyspark.sql import SparkSession
 
 
 def get_json(path):
+    """Fetch and decode JSON from the Unity Catalog smoke-test server URL."""
+
     request = urllib.request.Request(f"{UC_URI}{path}", method="GET")
     with urllib.request.urlopen(request, timeout=10) as response:
         return json.loads(response.read().decode("utf-8"))
@@ -15,6 +19,8 @@ UC_URI = "http://unity-catalog-unitycatalog-server.unity-catalog.svc.cluster.loc
 
 
 def post_if_missing(path, payload, exists_statuses=(400, 409)):
+    """Create a UC resource, ignoring response codes that mean it already exists."""
+
     request = urllib.request.Request(
         f"{UC_URI}{path}",
         data=json.dumps(payload).encode("utf-8"),

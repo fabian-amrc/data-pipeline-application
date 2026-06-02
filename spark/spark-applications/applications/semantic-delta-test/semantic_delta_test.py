@@ -1,3 +1,5 @@
+"""SparkApplication script for semantic Delta table and UC metadata validation."""
+
 import json
 
 from pyspark.sql import SparkSession
@@ -9,6 +11,8 @@ from semantic_uc import get_uc_table, verify_semantic_table
 
 
 def main():
+    """Run the semantic Delta write/read test and validate UC registration."""
+
     settings = load_settings()
     create_bucket_if_missing(
         settings.endpoint,

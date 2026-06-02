@@ -1,3 +1,10 @@
+"""Unity Catalog projection client for semantic mapper metadata.
+
+This module turns ontology and mapping annotations into Unity Catalog catalogs,
+schemas, and external Delta table metadata. It uses the UC REST API directly so
+the mapper job does not need additional client dependencies.
+"""
+
 import json
 import os
 from pathlib import Path
@@ -10,10 +17,15 @@ from lib.semantic_rdf import parse_mapping_projections, parse_ontology_classes
 
 
 class UnityCatalogClient:
+    """Minimal REST client for the Unity Catalog server API."""
+
     def __init__(self, api_url: str):
+        """Store the base `/api/2.1/unity-catalog` URL."""
         self.api_url = api_url
 
     def headers(self, content_type: str) -> Dict[str, str]:
+        """Build JSON request headers with an optional bearer token."""
+
         result = {"Content-Type": content_type}
         token = os.getenv("UNITY_CATALOG_BEARER_TOKEN")
         if token:
@@ -21,6 +33,8 @@ class UnityCatalogClient:
         return result
 
     def request(self, path: str, method: str = "GET", payload=None, query=None):
+        """Send a UC REST request and decode any JSON response body."""
+
         url = f"{self.api_url}{path}"
         if query:
             url = f"{url}?{urlencode(query)}"
@@ -31,6 +45,8 @@ class UnityCatalogClient:
             return response.status, json.loads(body) if body else None
 
     def post_if_missing(self, path: str, payload: Dict[str, object], exists_statuses=(400, 409)) -> None:
+        """POST a resource, treating configured conflict statuses as success."""
+
         try:
             status, _body = self.request(path, method="POST", payload=payload)
             print(f"Created Unity Catalog resource at {path}: HTTP {status}")
@@ -41,6 +57,8 @@ class UnityCatalogClient:
             raise
 
     def get_table(self, full_name: str):
+        """Return a UC table payload by full name, or None when absent."""
+
         try:
             _status, table = self.request(f"/tables/{quote(full_name, safe='')}")
             return table
@@ -51,6 +69,8 @@ class UnityCatalogClient:
             raise
 
     def ensure_namespace(self, catalog_name: str, schema_name: str) -> None:
+        """Ensure the target catalog and schema exist before table creation."""
+
         self.post_if_missing(
             "/catalogs",
             {"name": catalog_name, "comment": "Local semantic mapper catalog"},
@@ -70,6 +90,8 @@ class UnityCatalogClient:
         class_metadata: Dict[str, str],
         strict: bool,
     ) -> None:
+        """Create a projected table or verify semantic metadata on an existing one."""
+
         full_name = str(projection["full_name"])
         class_iri = str(projection["class_iri"])
         storage_location = str(projection.get("storage_location") or "")
@@ -119,6 +141,8 @@ class UnityCatalogClient:
         expected_properties: Dict[str, str],
         strict: bool,
     ) -> None:
+        """Check whether an existing UC table carries expected semantic properties."""
+
         existing_properties = table.get("properties") or {}
         missing = {
             key: value
@@ -138,6 +162,8 @@ class UnityCatalogClient:
         print(f"WARNING: {message}")
 
     def _create_table(self, full_name: str, payload: Dict[str, object]) -> None:
+        """Create a UC external Delta table from a prepared REST payload."""
+
         try:
             status, _table = self.request("/tables", method="POST", payload=payload)
             print(f"Projected semantic metadata by creating UC table {full_name}: HTTP {status}")
@@ -155,6 +181,8 @@ def project_to_unity_catalog(
     mapping_files: List[Path],
     strict: bool,
 ) -> None:
+    """Project all annotated mapping targets into Unity Catalog metadata."""
+
     classes = parse_ontology_classes(ontology_files)
     projections = parse_mapping_projections(mapping_files)
     if not projections:

@@ -1,8 +1,12 @@
+"""File loading helpers for semantic mapper Turtle sources."""
+
 from pathlib import Path
 from typing import Iterable, List
 
 
 def ttl_files(directory: Path) -> List[Path]:
+    """Return visible `.ttl` files under a directory in stable order."""
+
     return sorted(
         path
         for path in directory.rglob("*.ttl")
@@ -11,6 +15,8 @@ def ttl_files(directory: Path) -> List[Path]:
 
 
 def read_all(files: Iterable[Path]) -> str:
+    """Concatenate source files with lightweight source markers for debugging."""
+
     chunks = []
     for file in files:
         chunks.append(f"# Source: {file.name}\n")

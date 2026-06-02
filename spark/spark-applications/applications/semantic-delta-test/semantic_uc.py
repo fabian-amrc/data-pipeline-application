@@ -1,9 +1,13 @@
+"""Unity Catalog assertions for the semantic Delta SparkApplication."""
+
 import json
 import urllib.parse
 import urllib.request
 
 
 def get_uc_table(api_url, full_name):
+    """Fetch one Unity Catalog table by fully-qualified table name."""
+
     encoded_name = urllib.parse.quote(full_name, safe="")
     request = urllib.request.Request(f"{api_url}/tables/{encoded_name}", method="GET")
     with urllib.request.urlopen(request, timeout=20) as response:
@@ -11,6 +15,8 @@ def get_uc_table(api_url, full_name):
 
 
 def verify_semantic_table(uc_info, full_name, output_path):
+    """Assert that UC metadata matches the expected semantic table projection."""
+
     properties = uc_info.get("properties") or {}
     if properties.get("semantic.class") != "https://data-pipeline.local/ontology/Dataset":
         raise RuntimeError(f"UC table {full_name} is missing semantic.class property: {properties}")

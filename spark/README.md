@@ -55,6 +55,12 @@ kubectl logs -n spark-jobs -l spark-role=driver
 - If the operator is not ready, the SparkApplication will remain pending until the CRD is available.
 - Update `spark/image/Dockerfile` for shared Spark dependencies or runtime image setup, `spark/image/conf/spark-defaults.conf` for image-level Spark defaults, or the individual SparkApplication manifests for per-job image, `spec.sparkConf`, main class, and resource sizing changes.
 
+## Shared Spark application Python library
+
+Spark application helper code that is shared across jobs lives in `spark/spark-applications/lib`. Kustomize includes those files in each application ConfigMap that needs them, so jobs can import the helpers from `/app` without baking application code into `data-pipeline-spark:3.5.3`.
+
+`lib/minio_s3.py` centralizes MinIO credential resolution, `s3a://` bucket parsing, and standard-library S3 bucket creation. Keep app-specific defaults and Spark logic in each application directory, and put reusable runtime helpers in `lib` when more than one SparkApplication needs them.
+
 ## Spark configuration precedence
 
 Spark reads `spark-defaults.conf` as defaults only. The local Spark image merges those defaults with the Spark operator generated properties file at container startup. Values set on a `SparkApplication` under `spec.sparkConf` remain in the generated properties file and override matching image defaults. The image entrypoint also reads `MINIO_CONFIG_ENV_FILE`, when mounted, and exports AWS credentials so the shared S3A environment-variable credential provider works for drivers and executors.
