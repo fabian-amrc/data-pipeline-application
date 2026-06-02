@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: unity-catalog-unitycatalog-server
+spec:
+  template:
+    spec:
+      initContainers:
+        - name: init
+          command:
+            - /bin/sh
+            - -c
+            - |-
+              set -eu
+
+              render_config() {
+                source="$1"
+                target="$2"
+
+                if grep -Fq "\${" "${source}"; then
+                  if ! command -v envsubst >/dev/null 2>&1; then
+                    echo "ERROR: ${source} requires envsubst, but envsubst is not available in the init image." >&2
+                    echo "Use an init image that includes envsubst when auth, S3, ADLS, or PostgreSQL password substitution is enabled." >&2
+                    exit 1
+                  fi
+                  envsubst < "${source}" > "${target}"
+                else
+                  cp "${source}" "${target}"
+                fi
+              }
+
+              render_config /home/unitycatalog/etc/confTemplates/server.properties.template /home/unitycatalog/etc/conf/server.properties
+              render_config /home/unitycatalog/etc/confTemplates/server.log4j2.properties.template /home/unitycatalog/etc/conf/server.log4j2.properties
+              render_config /home/unitycatalog/etc/confTemplates/hibernate.properties.template /home/unitycatalog/etc/conf/hibernate.properties
+
+              echo "Looking up JWT signing key..."
+              if [ -f /home/unitycatalog/etc/conf/private_key.der ] || [ -f /home/unitycatalog/etc/conf/private_key.pem ]; then
+                echo "JWT signing key already exists, skipping..."
+              elif [ -f /home/unitycatalog/etc/confJwtKey/private_key.der ]; then
+                echo "Using /home/unitycatalog/etc/confJwtKey/private_key.der..."
+                cp /home/unitycatalog/etc/confJwtKey/private_key.der /home/unitycatalog/etc/conf/private_key.der
+              elif [ -f /home/unitycatalog/etc/confJwtKey/private_key.pem ]; then
+                echo "Using /home/unitycatalog/etc/confJwtKey/private_key.pem..."
+                cp /home/unitycatalog/etc/confJwtKey/private_key.pem /home/unitycatalog/etc/conf/private_key.pem
+              else
+                echo "ERROR: No private_key.der or private_key.pem found in /home/unitycatalog/etc/conf or /home/unitycatalog/etc/confJwtKey"
+                exit 1
+              fi
+
+              echo "Looking up key_id.txt..."
+              if [ -f /home/unitycatalog/etc/conf/key_id.txt ]; then
+                echo "Key ID file already exists, skipping..."
+              elif [ -f /home/unitycatalog/etc/confJwtKey/key_id.txt ]; then
+                echo "Using /home/unitycatalog/etc/confJwtKey/key_id.txt..."
+                cp /home/unitycatalog/etc/confJwtKey/key_id.txt /home/unitycatalog/etc/conf/key_id.txt
+              else
+                echo "ERROR: No key_id.txt found in /home/unitycatalog/etc/confJwtKey"
+                exit 1
+              fi
+
+              # Set permissions for the mounted volumes uid:gid 100:101 - unitycatalog:unitycatalog
+              chown -R 100:101 /home/unitycatalog/etc/conf

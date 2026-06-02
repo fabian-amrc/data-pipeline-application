@@ -8,3 +8,5 @@ helmCharts:
     includeCRDs: true
 resources:
   - manifests
+patches:
+  - path: patches/server-init-command.yaml
