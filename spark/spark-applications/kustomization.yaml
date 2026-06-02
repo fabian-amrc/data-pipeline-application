@@ -3,8 +3,12 @@ kind: Kustomization
 namespace: spark-jobs
 resources:
   - applications/spark-pi/spark-pi-sparkapplication.yaml
+  - applications/delta-test/delta-test-sparkapplication.yaml
   - applications/uc-smoke-test/uc-smoke-test-sparkapplication.yaml
 configMapGenerator:
+  - name: delta-test-script
+    files:
+      - delta_test.py=applications/delta-test/delta_test.py
   - name: uc-smoke-test-script
     files:
       - uc_smoke_test.py=applications/uc-smoke-test/uc_smoke_test.py

@@ -30,6 +30,10 @@ ADD https://repo1.maven.org/maven2/io/delta/delta-spark_2.12/3.3.0/delta-spark_2
 ADD https://repo1.maven.org/maven2/io/delta/delta-standalone_2.12/3.3.0/delta-standalone_2.12-3.3.0.jar /opt/bitnami/spark/jars/
 ADD https://repo1.maven.org/maven2/io/delta/delta-storage/3.3.0/delta-storage-3.3.0.jar /opt/bitnami/spark/jars/
 
+# S3A / MinIO jars
+ADD https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.3.4/hadoop-aws-3.3.4.jar /opt/bitnami/spark/jars/
+ADD https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/1.12.262/aws-java-sdk-bundle-1.12.262.jar /opt/bitnami/spark/jars/
+
 # Unity Catalog jars
 ADD https://repo1.maven.org/maven2/io/unitycatalog/unitycatalog-spark_2.12/0.2.1/unitycatalog-spark_2.12-0.2.1.jar /opt/bitnami/spark/jars/
 ADD https://repo1.maven.org/maven2/io/unitycatalog/unitycatalog-client/0.2.1/unitycatalog-client-0.2.1.jar /opt/bitnami/spark/jars/

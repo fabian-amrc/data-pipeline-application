@@ -10,6 +10,7 @@ This directory contains the Spark operator deployment and example Spark applicat
 - `image/conf/spark-defaults.conf` - Shared Spark defaults baked into the local image; per-application `spec.sparkConf` values override these at submit time
 - `spark-applications/app.yaml` - Argo CD application for SparkApplication resources
 - `spark-applications/applications/spark-pi/spark-pi-sparkapplication.yaml` - Spark Pi sample application for testing
+- `spark-applications/applications/delta-test/delta-test-sparkapplication.yaml` - Delta Lake and MinIO S3A write/read test
 
 ## How to test
 
@@ -42,7 +43,9 @@ kubectl get pods -n spark-jobs
 kubectl logs -n spark-jobs -l spark-role=driver
 ```
 
-6. If you want Spark UI access, expose the driver web UI or deploy a Spark History Server.
+6. The Delta test writes a small table to `s3a://delta/delta-test`, reads it back, and prints the resulting rows. It defaults to the in-cluster MinIO endpoint and reads credentials from a `myminio-env-configuration` secret in the `spark-jobs` namespace with the same `config.env` key used by the MinIO tenant. Override `MINIO_ENDPOINT` or `OUTPUT_PATH` in `spark/spark-applications/applications/delta-test/delta-test-sparkapplication.yaml` if your tenant uses different values.
+
+7. If you want Spark UI access, expose the driver web UI or deploy a Spark History Server.
    - The current sample is primarily a functional test of the operator.
 
 ## Notes
