@@ -4,6 +4,7 @@ spark/operator/charts/
 minio/operator/charts/
 minio/tenant/charts/
 traefik/charts/
+unity-catalog/charts/
 
 # Generated host kubeconfig with client credentials.
 .devcontainer/kubeconfig
