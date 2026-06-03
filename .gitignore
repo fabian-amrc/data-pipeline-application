@@ -11,3 +11,7 @@ unity-catalog/charts/
 # Python cache files.
 __pycache__/
 *.py[cod]
+# Python packaging artifacts.
+build/
+dist/
+*.egg-info/

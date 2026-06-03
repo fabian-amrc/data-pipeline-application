@@ -94,6 +94,8 @@ The Python API never requires users to define URI templates directly.
 
 ## REST API
 
+The REST API is implemented with FastAPI and served by Uvicorn from `semantic_mapper.api.app:app`.
+
 ### Ontologies
 
 - `GET /ontologies`
