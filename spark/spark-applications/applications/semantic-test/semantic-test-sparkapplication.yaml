@@ -1,21 +1,24 @@
 apiVersion: sparkoperator.k8s.io/v1beta2
 kind: SparkApplication
 metadata:
-  name: semantic-delta-test
+  name: semantic-test
   namespace: spark-jobs
 spec:
   type: Python
   mode: cluster
   image: data-pipeline-spark:3.5.3
   imagePullPolicy: IfNotPresent
-  mainApplicationFile: local:///app/semantic_delta_test.py
+  mainApplicationFile: local:///app/semantic_test.py
+  deps:
+    pyFiles:
+      - local:///opt/data-pipeline/semantic_mapper_client.zip
   sparkVersion: "3.5.3"
   restartPolicy:
     type: Never
   volumes:
-    - name: semantic-delta-test-script
+    - name: semantic-test-script
       configMap:
-        name: semantic-delta-test-script
+        name: semantic-test-script
         defaultMode: 0555
     - name: minio-tenant-env
       secret:
@@ -26,11 +29,8 @@ spec:
     labels:
       version: 3.5.3
     serviceAccount: spark-operator-spark
-    env:
-      - name: MINIO_CONFIG_ENV_FILE
-        value: /var/run/minio-tenant/config.env
     volumeMounts:
-      - name: semantic-delta-test-script
+      - name: semantic-test-script
         mountPath: /app
         readOnly: true
       - name: minio-tenant-env
@@ -43,11 +43,8 @@ spec:
     memory: 1g
     labels:
       version: 3.5.3
-    env:
-      - name: MINIO_CONFIG_ENV_FILE
-        value: /var/run/minio-tenant/config.env
     volumeMounts:
-      - name: semantic-delta-test-script
+      - name: semantic-test-script
         mountPath: /app
         readOnly: true
       - name: minio-tenant-env

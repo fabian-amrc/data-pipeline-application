@@ -9,7 +9,7 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends ca-certificates dos2unix python3-pip \
   && rm -rf /var/lib/apt/lists/*
 
-COPY certs/ /tmp/spark-certs/
+COPY spark/image/certs/ /tmp/spark-certs/
 
 RUN if [ -f /tmp/spark-certs/minikubeCA.crt ]; then \
     dos2unix /tmp/spark-certs/minikubeCA.crt; \
@@ -49,8 +49,13 @@ ADD https://repo1.maven.org/maven2/org/apache/spark/spark-token-provider-kafka-0
 # Apache jars
 ADD https://repo1.maven.org/maven2/org/apache/commons/commons-pool2/2.12.1/commons-pool2-2.12.1.jar /opt/bitnami/spark/jars/
 
-COPY conf/spark-defaults.conf /opt/bitnami/spark/conf.default/spark-defaults.conf
-COPY scripts/entrypoint.sh /opt/data-pipeline/entrypoint.sh
+COPY spark/image/conf/spark-defaults.conf /opt/bitnami/spark/conf.default/spark-defaults.conf
+COPY spark/image/scripts/entrypoint.sh /opt/data-pipeline/entrypoint.sh
+COPY semantic-mapper/client/semantic_mapper.py /tmp/semantic-mapper-client/semantic_mapper.py
+
+RUN cd /tmp/semantic-mapper-client \
+  && python3 -m zipfile -c /opt/data-pipeline/semantic_mapper_client.zip semantic_mapper.py \
+  && rm -rf /tmp/semantic-mapper-client
 
 RUN chmod -R a+r /opt/bitnami/spark/jars /opt/bitnami/spark/conf.default/spark-defaults.conf \
   && chmod +x /opt/data-pipeline/entrypoint.sh

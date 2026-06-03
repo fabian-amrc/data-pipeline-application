@@ -19,7 +19,7 @@ DEFAULT_OUTPUT_PATH = "s3a://delta/delta-test"
 
 output_path = os.getenv("OUTPUT_PATH", DEFAULT_OUTPUT_PATH)
 endpoint = os.getenv("MINIO_ENDPOINT", DEFAULT_MINIO_ENDPOINT)
-access_key, secret_key = resolve_minio_credentials(os.getenv("MINIO_CONFIG_ENV_FILE"))
+access_key, secret_key = resolve_minio_credentials()
 region = os.getenv("AWS_REGION", DEFAULT_AWS_REGION)
 bucket = bucket_from_s3a_uri(output_path, "OUTPUT_PATH")
 

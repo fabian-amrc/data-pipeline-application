@@ -29,8 +29,6 @@ spec:
     env:
       - name: OUTPUT_PATH
         value: s3a://delta/delta-test
-      - name: MINIO_CONFIG_ENV_FILE
-        value: /var/run/minio-tenant/config.env
     volumeMounts:
       - name: delta-test-script
         mountPath: /app/delta_test.py
@@ -51,8 +49,6 @@ spec:
     env:
       - name: OUTPUT_PATH
         value: s3a://delta/delta-test
-      - name: MINIO_CONFIG_ENV_FILE
-        value: /var/run/minio-tenant/config.env
     volumeMounts:
       - name: delta-test-script
         mountPath: /app/delta_test.py

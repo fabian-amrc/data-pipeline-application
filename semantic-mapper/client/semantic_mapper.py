@@ -1,4 +1,3 @@
-
 """Client-side Python DSL for registering semantic mappings.
 
 Users describe datasets, subjects, and columns with ordinary Python objects.
@@ -8,6 +7,8 @@ Catalog.
 """
 
 import json
+import os
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -15,10 +16,14 @@ from pathlib import Path
 class SemanticMapper:
     """Session scoped to one ontology and mapping profile."""
 
-    def __init__(self, ontology: str, profile: str, base_url: str = "http://semantic-mapper.semantic-mapper.svc.cluster.local:8080"):
-        self.ontology = ontology
-        self.profile = profile
-        self.base_url = base_url.rstrip("/")
+    def __init__(self, ontology: str = "", profile: str = "", base_url: str = ""):
+        self.ontology = ontology or os.getenv("SEMANTIC_MAPPER_ONTOLOGY", "manufacturing-rdl")
+        self.profile = profile or os.getenv("SEMANTIC_MAPPER_PROFILE", "spark-delta")
+        self.base_url = (
+            base_url
+            or os.getenv("SEMANTIC_MAPPER_API_URL")
+            or "http://semantic-mapper.semantic-mapper.svc.cluster.local:8080"
+        ).rstrip("/")
 
     def dataset(self, name: str):
         """Begin a semantic mapping definition for a dataset or table."""
@@ -35,6 +40,21 @@ class SemanticMapper:
 
         return self.register_rml(Path(path).read_text(encoding="utf-8"))
 
+    def validate_mapping(self, mapping):
+        """Validate a registered mapping by id or response payload."""
+
+        return self._request(f"/mappings/{mapping_id(mapping)}/validate", {})
+
+    def activate_mapping(self, mapping):
+        """Activate a registered mapping and publish active RML to Fuseki."""
+
+        return self._request(f"/mappings/{mapping_id(mapping)}/activate", {})
+
+    def project_unity_catalog(self, mapping):
+        """Project one registered mapping into Unity Catalog metadata."""
+
+        return self._request(f"/mappings/{mapping_id(mapping)}/project/unity-catalog", {})
+
     def _request(self, path: str, payload: dict):
         data = json.dumps(payload).encode("utf-8")
         request = urllib.request.Request(
@@ -43,8 +63,12 @@ class SemanticMapper:
             headers={"Content-Type": "application/json"},
             method="POST",
         )
-        with urllib.request.urlopen(request, timeout=30) as response:
-            return json.loads(response.read().decode("utf-8"))
+        try:
+            with urllib.request.urlopen(request, timeout=30) as response:
+                return json.loads(response.read().decode("utf-8"))
+        except urllib.error.HTTPError as exc:
+            body = exc.read().decode("utf-8", errors="replace")
+            raise RuntimeError(f"Semantic Mapper API {exc.code} for {path}: {body}") from exc
 
 
 class DatasetMapping:
@@ -85,6 +109,15 @@ class DatasetMapping:
         """Submit this mapping definition to the Semantic Mapper API."""
 
         return self.mapper._request("/mappings", self.to_payload())
+
+    def register_and_project(self):
+        """Register, validate, activate, and project this mapping."""
+
+        mapping = self.register()
+        validation = self.mapper.validate_mapping(mapping)
+        activated = self.mapper.activate_mapping(mapping)
+        projection = self.mapper.project_unity_catalog(mapping)
+        return {"mapping": activated, "validation": validation, "projection": projection}
 
     def to_payload(self):
         """Return the JSON payload consumed by `POST /mappings`."""
@@ -137,3 +170,13 @@ class ColumnMapping:
 
     def _base(self, kind: str, **extra):
         return {"name": self.name, "type_name": self.type_name, "comment": self.comment, "kind": kind, **extra}
+
+
+def mapping_id(mapping):
+    """Return a mapping id from a raw id string or API response payload."""
+
+    if isinstance(mapping, str):
+        return mapping
+    if isinstance(mapping, dict) and mapping.get("id"):
+        return str(mapping["id"])
+    raise ValueError(f"Mapping id is required, got {mapping!r}")

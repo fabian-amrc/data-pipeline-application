@@ -6,7 +6,7 @@ ORIGINAL_ENTRYPOINT="/opt/bitnami/scripts/spark/entrypoint.sh"
 
 
 load_minio_credentials() {
-  local env_file="${MINIO_CONFIG_ENV_FILE:-}"
+  local env_file="${MINIO_CONFIG_ENV_FILE:-/var/run/minio-tenant/config.env}"
 
   if [ -z "${env_file}" ] || [ ! -f "${env_file}" ]; then
     return 0

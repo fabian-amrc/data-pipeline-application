@@ -18,6 +18,7 @@ import urllib.request
 
 DEFAULT_MINIO_ENDPOINT = "http://data-pipeline-hl.minio-tenant.svc.cluster.local:9000"
 DEFAULT_AWS_REGION = "us-east-1"
+DEFAULT_MINIO_CONFIG_ENV_FILE = "/var/run/minio-tenant/config.env"
 
 
 def sign(key, message):
@@ -60,6 +61,7 @@ def resolve_minio_credentials(env_file_path=None):
     MINIO_ACCESS_KEY/MINIO_SECRET_KEY, then MINIO_ROOT_USER/MINIO_ROOT_PASSWORD
     from the optional config.env file.
     """
+    env_file_path = env_file_path or os.getenv("MINIO_CONFIG_ENV_FILE", DEFAULT_MINIO_CONFIG_ENV_FILE)
     minio_env = load_minio_env_file(env_file_path)
     access_key = os.getenv(
         "AWS_ACCESS_KEY_ID",
@@ -73,7 +75,7 @@ def resolve_minio_credentials(env_file_path=None):
     if not access_key or not secret_key:
         raise ValueError(
             "MinIO credentials are required. Set AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY "
-            "or mount the tenant config.env and set MINIO_CONFIG_ENV_FILE."
+            "or mount the tenant config.env at /var/run/minio-tenant/config.env."
         )
 
     return access_key, secret_key

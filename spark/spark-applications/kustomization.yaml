@@ -4,22 +4,18 @@ namespace: spark-jobs
 resources:
   - applications/spark-pi/spark-pi-sparkapplication.yaml
   - applications/delta-test/delta-test-sparkapplication.yaml
-  - applications/semantic-delta-test/semantic-delta-test-sparkapplication.yaml
+  - applications/semantic-test/semantic-test-sparkapplication.yaml
   - applications/uc-smoke-test/uc-smoke-test-sparkapplication.yaml
 configMapGenerator:
   - name: delta-test-script
     files:
       - delta_test.py=applications/delta-test/delta_test.py
       - minio_s3.py=lib/minio_s3.py
-  - name: semantic-delta-test-script
+  - name: semantic-test-script
     files:
-      - semantic_delta_test.py=applications/semantic-delta-test/semantic_delta_test.py
-      - semantic_delta_config.py=applications/semantic-delta-test/semantic_delta_config.py
+      - semantic_test.py=applications/semantic-test/semantic_test.py
       - minio_s3.py=lib/minio_s3.py
-      - semantic_mapping.py=lib/semantic_mapping.py
-      - dataset_semantics.py=applications/semantic-delta-test/dataset_semantics.py
-      - sample_dataset.py=applications/semantic-delta-test/sample_dataset.py
-      - semantic_uc.py=applications/semantic-delta-test/semantic_uc.py
+      - semantic_uc.py=applications/semantic-test/semantic_uc.py
   - name: uc-smoke-test-script
     files:
       - uc_smoke_test.py=applications/uc-smoke-test/uc_smoke_test.py

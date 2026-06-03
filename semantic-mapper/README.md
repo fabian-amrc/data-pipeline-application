@@ -19,14 +19,9 @@ The client library lives at `semantic-mapper/client/semantic_mapper.py`. It give
 ```python
 from semantic_mapper import SemanticMapper
 
-mapper = SemanticMapper(
-    ontology="manufacturing-rdl",
-    profile="spark-delta",
-    base_url="http://semantic-mapper.semantic-mapper.svc.cluster.local:8080",
-)
-
 mapping = (
-    mapper.dataset("unity.default.example_dataset")
+    SemanticMapper()
+    .dataset("unity.default.example_dataset")
     .row_subject(rdf_class="dpa:Dataset")
     .subject_identifier(column="id", scheme="dpa:dataset-id")
     .storage(source_uri="s3a://delta/example-dataset", storage_location="s3://delta/example-dataset")
@@ -34,13 +29,13 @@ mapping = (
     .column("name", "STRING", "Display name").literal(predicate="dpa:name")
     .column("age", "INT", "Example numeric attribute").literal(predicate="dpa:age", datatype="xsd:integer")
     .column("city", "STRING", "Example city attribute").classification(term="dpa:LocationAttribute")
-    .register()
+    .register_and_project()
 )
 ```
 
 ### Session
 
-`SemanticMapper(ontology: str, profile: str, base_url: str = ...)` creates a mapper session scoped to a specific ontology and profile.
+`SemanticMapper()` creates a mapper session using the standard in-cluster defaults: `manufacturing-rdl`, `spark-delta`, and the Semantic Mapper service URL. Override `ontology`, `profile`, or `base_url`, or set `SEMANTIC_MAPPER_ONTOLOGY`, `SEMANTIC_MAPPER_PROFILE`, or `SEMANTIC_MAPPER_API_URL` when needed.
 
 ### Dataset Mapping
 
@@ -71,6 +66,8 @@ mapping = (
 ### Registration
 
 `dataset.register()` submits the simple mapping definition to the Semantic Mapper API. The API generates RML/Turtle, validates it, stores it, and returns the mapping record.
+
+`dataset.register_and_project()` performs the common SparkApplication flow: register, validate, activate the mapping graph, and project Unity Catalog metadata.
 
 ### Expert Mode
 

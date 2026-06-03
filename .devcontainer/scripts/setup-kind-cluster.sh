@@ -9,7 +9,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 HOST_KUBECONFIG="${HOST_KUBECONFIG:-${REPO_ROOT}/.devcontainer/kubeconfig}"
 SPARK_IMAGE="${SPARK_IMAGE:-data-pipeline-spark:3.5.3}"
-SPARK_IMAGE_CONTEXT="${SPARK_IMAGE_CONTEXT:-${REPO_ROOT}/spark/image}"
+SPARK_IMAGE_CONTEXT="${SPARK_IMAGE_CONTEXT:-${REPO_ROOT}}"
 SPARK_IMAGE_BUILD="${SPARK_IMAGE_BUILD:-true}"
 
 require_command() {
@@ -59,7 +59,7 @@ build_and_load_spark_image() {
   fi
 
   echo "Building Spark image: ${SPARK_IMAGE}"
-  docker build -t "${SPARK_IMAGE}" "${SPARK_IMAGE_CONTEXT}"
+  docker build -t "${SPARK_IMAGE}" -f "${REPO_ROOT}/spark/image/Dockerfile" "${SPARK_IMAGE_CONTEXT}"
 
   echo "Loading Spark image into kind cluster: ${CLUSTER_NAME}"
   kind load docker-image "${SPARK_IMAGE}" --name "${CLUSTER_NAME}"

@@ -126,7 +126,7 @@ Argo CD must run Kustomize with Helm enabled. The Argo CD values set
 - The MinIO tenant values are intentionally small and suitable for a starting point only.
 - The Spark smoke-test Python script is stored as a `.py` file and generated into a ConfigMap by Kustomize. Spark applications use the local `data-pipeline-spark:3.5.3` image built from `spark/image`.
 
-- `semantic-mapper/` is the source of truth for ontology/RDL, SHACL shapes, mappings, and metadata projection code. Its sync Job publishes ontology, mappings, and shapes into separate Fuseki named graphs, then projects selected metadata into Unity Catalog. `fuseki/` owns the triplestore runtime implementation.
+- `semantic-mapper/` is the source of truth for ontology/RDL, SHACL shapes, the Semantic Mapper REST API, and metadata projection code. Spark applications register simple mappings through its Python client; the API generates RML, stores mappings centrally, activates the mappings graph in Fuseki, and projects selected metadata into Unity Catalog. `fuseki/` owns the triplestore runtime implementation.
 
 ## Local Dashboard Access
 
