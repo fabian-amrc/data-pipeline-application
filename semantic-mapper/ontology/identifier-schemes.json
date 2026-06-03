@@ -1,0 +1,19 @@
+{
+  "schemes": [
+    {
+      "id": "dpa:dataset-id",
+      "label": "Dataset identifier",
+      "template": "https://data-pipeline.local/resource/dataset/{value}"
+    },
+    {
+      "id": "sea:mmsi",
+      "label": "Maritime Mobile Service Identity",
+      "template": "https://data-pipeline.local/resource/vessel/mmsi/{value}"
+    },
+    {
+      "id": "manufacturing:asset-id",
+      "label": "Manufacturing asset identifier",
+      "template": "https://data-pipeline.local/resource/manufacturing/asset/{value}"
+    }
+  ]
+}

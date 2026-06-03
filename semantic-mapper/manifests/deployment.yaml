@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: semantic-mapper-api
+  labels:
+    app.kubernetes.io/name: semantic-mapper
+    app.kubernetes.io/component: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: semantic-mapper
+      app.kubernetes.io/component: api
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: semantic-mapper
+        app.kubernetes.io/component: api
+        app.kubernetes.io/part-of: semantic-layer
+    spec:
+      containers:
+        - name: api
+          image: python:3.12-slim
+          imagePullPolicy: IfNotPresent
+          command:
+            - python
+            - /app/api.py
+          ports:
+            - name: http
+              containerPort: 8080
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
+          env:
+            - name: SEMANTIC_MAPPER_HTTP_PORT
+              value: "8080"
+            - name: ONTOLOGY_ID
+              value: manufacturing-rdl
+            - name: SEMANTIC_MAPPER_STATE_DIR
+              value: /semantic-mapper/state
+            - name: FUSEKI_DATA_URL
+              value: http://fuseki.fuseki.svc.cluster.local:3030/semantic/data
+            - name: FUSEKI_PING_URL
+              value: http://fuseki.fuseki.svc.cluster.local:3030/$/ping
+            - name: FUSEKI_USERNAME
+              value: admin
+            - name: FUSEKI_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: fuseki-admin
+                  key: password
+            - name: MAPPINGS_GRAPH_IRI
+              value: https://data-pipeline.local/graph/mappings
+            - name: UNITY_CATALOG_API_URL
+              value: http://unity-catalog-unitycatalog-server.unity-catalog.svc.cluster.local:8080/api/2.1/unity-catalog
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 2
+            periodSeconds: 5
+          volumeMounts:
+            - name: script
+              mountPath: /app
+              readOnly: true
+            - name: ontology
+              mountPath: /semantic-mapper/ontology
+              readOnly: true
+            - name: state
+              mountPath: /semantic-mapper/state
+      volumes:
+        - name: script
+          configMap:
+            name: semantic-mapper-script
+            items:
+              - key: api.py
+                path: api.py
+              - key: lib_init.py
+                path: lib/__init__.py
+              - key: clients_init.py
+                path: lib/clients/__init__.py
+              - key: fuseki_client.py
+                path: lib/clients/fuseki.py
+              - key: unity_catalog_client.py
+                path: lib/clients/unity_catalog.py
+              - key: mapping_init.py
+                path: lib/mapping/__init__.py
+              - key: mapping_generator.py
+                path: lib/mapping/generator.py
+              - key: rdf_init.py
+                path: lib/rdf/__init__.py
+              - key: rdf_files.py
+                path: lib/rdf/files.py
+              - key: rml_parser.py
+                path: lib/rdf/rml.py
+              - key: storage.py
+                path: lib/storage.py
+        - name: ontology
+          configMap:
+            name: semantic-ontology
+        - name: state
+          persistentVolumeClaim:
+            claimName: semantic-mapper-state

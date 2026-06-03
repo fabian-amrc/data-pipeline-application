@@ -3,27 +3,29 @@ kind: Kustomization
 namespace: semantic-mapper
 resources:
   - manifests/namespace.yaml
-  - manifests/job.yaml
+  - manifests/deployment.yaml
+  - manifests/service.yaml
+  - manifests/pvc.yaml
   - manifests/fuseki-admin-secret.yaml
 
 configMapGenerator:
   - name: semantic-mapper-script
     files:
-      - semantic_mapper.py=mapper/semantic_mapper.py
-      - semantic_lib_init.py=mapper/lib/__init__.py
-      - semantic_config.py=mapper/lib/semantic_config.py
-      - semantic_definitions.py=mapper/lib/semantic_definitions.py
-      - semantic_files.py=mapper/lib/semantic_files.py
-      - semantic_fuseki.py=mapper/lib/semantic_fuseki.py
-      - semantic_rdf.py=mapper/lib/semantic_rdf.py
-      - semantic_unity_catalog.py=mapper/lib/semantic_unity_catalog.py
-      - semantic_mapping.py=mapper/lib/semantic_mapping.py
+      - api.py=mapper/api.py
+      - lib_init.py=mapper/lib/__init__.py
+      - clients_init.py=mapper/lib/clients/__init__.py
+      - fuseki_client.py=mapper/lib/clients/fuseki.py
+      - unity_catalog_client.py=mapper/lib/clients/unity_catalog.py
+      - mapping_init.py=mapper/lib/mapping/__init__.py
+      - mapping_generator.py=mapper/lib/mapping/generator.py
+      - rdf_init.py=mapper/lib/rdf/__init__.py
+      - rdf_files.py=mapper/lib/rdf/files.py
+      - rml_parser.py=mapper/lib/rdf/rml.py
+      - storage.py=mapper/lib/storage.py
   - name: semantic-ontology
     files:
       - core.ttl=ontology/core.ttl
-  - name: semantic-application-definitions
-    files:
-      - dataset_semantics.py=definitions/dataset_semantics.py
+      - identifier-schemes.json=ontology/identifier-schemes.json
   - name: semantic-shapes
     files:
       - ontology-quality.shacl.ttl=shapes/ontology-quality.shacl.ttl

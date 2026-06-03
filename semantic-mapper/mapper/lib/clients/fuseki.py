@@ -8,7 +8,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote
 from urllib.request import Request, urlopen
 
-from lib.semantic_files import read_all
+from lib.rdf.files import read_all
 
 
 class FusekiClient:

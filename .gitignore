@@ -8,3 +8,6 @@ unity-catalog/charts/
 
 # Generated host kubeconfig with client credentials.
 .devcontainer/kubeconfig
+# Python cache files.
+__pycache__/
+*.py[cod]

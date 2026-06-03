@@ -1,5 +1,7 @@
 # Semantic Mappings
 
-This directory is reserved for optional hand-authored RML/R2RML mappings. The preferred path for Spark-authored datasets is to declare semantics in Python with `semantic_mapping.semantic_table`; the semantic mapper renders those declarations to RML and uploads the generated Turtle to the mappings graph.
+Mappings are now registered through the Semantic Mapper REST API.
 
-Keep hand-authored RML here only when a mapping cannot be expressed with the minimal Python declaration API.
+Use the Python DSL for normal Spark/data-asset mappings. The API generates RML/Turtle, validates it, stores it, and uploads active mappings to the mappings graph.
+
+Use this directory only for optional hand-authored RML/Turtle examples or fixtures that cannot be expressed through the minimal Python API. Expert-authored RML should be registered with `POST /mappings/rml` or `SemanticMapper.register_rml_file(...)`.

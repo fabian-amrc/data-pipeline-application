@@ -13,7 +13,7 @@ from urllib.error import HTTPError
 from urllib.parse import quote, urlencode
 from urllib.request import Request, urlopen
 
-from lib.semantic_rdf import parse_mapping_projections, parse_ontology_classes
+from lib.rdf.rml import parse_mapping_projections, parse_ontology_classes
 
 
 class UnityCatalogClient:
