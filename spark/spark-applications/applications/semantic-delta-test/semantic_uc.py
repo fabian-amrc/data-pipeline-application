@@ -14,16 +14,17 @@ def get_uc_table(api_url, full_name):
         return json.loads(response.read().decode("utf-8"))
 
 
-def verify_semantic_table(uc_info, full_name, output_path):
-    """Assert that UC metadata matches the expected semantic table projection."""
+def verify_semantic_table(uc_info, semantics):
+    """Assert that UC metadata matches a Spark-authored semantic declaration."""
 
     properties = uc_info.get("properties") or {}
-    if properties.get("semantic.class") != "https://data-pipeline.local/ontology/Dataset":
-        raise RuntimeError(f"UC table {full_name} is missing semantic.class property: {properties}")
-
-    expected_uc_storage = output_path.replace("s3a://", "s3://", 1)
-    if uc_info.get("storage_location") != expected_uc_storage:
+    if properties.get("semantic.class") != semantics.class_iri:
         raise RuntimeError(
-            f"UC table {full_name} storage_location mismatch: "
-            f"{uc_info.get('storage_location')} != {expected_uc_storage}"
+            f"UC table {semantics.full_name} is missing semantic.class property: {properties}"
+        )
+
+    if uc_info.get("storage_location") != semantics.storage_location:
+        raise RuntimeError(
+            f"UC table {semantics.full_name} storage_location mismatch: "
+            f"{uc_info.get('storage_location')} != {semantics.storage_location}"
         )

@@ -1,19 +1,5 @@
 # Semantic Mappings
 
-Mappings align operational data to ontology terms. Prefer RML for files/object data and R2RML for relational sources.
+This directory is reserved for optional hand-authored RML/R2RML mappings. The preferred path for Spark-authored datasets is to declare semantics in Python with `semantic_mapping.semantic_table`; the semantic mapper renders those declarations to RML and uploads the generated Turtle to the mappings graph.
 
-Suggested layout:
-
-```text
-mappings/
-|- rml/
-|- r2rml/
-`- sources/
-```
-
-Rules:
-
-- Mappings reference ontology IRIs; they do not introduce authoritative semantics.
-- Keep source identifiers explicit and reviewable.
-- Version mapping changes with the ontology changes they depend on.
-- Include small sample inputs for validation where possible.
+Keep hand-authored RML here only when a mapping cannot be expressed with the minimal Python declaration API.

@@ -61,6 +61,12 @@ Spark application helper code that is shared across jobs lives in `spark/spark-a
 
 `lib/minio_s3.py` centralizes MinIO credential resolution, `s3a://` bucket parsing, and standard-library S3 bucket creation. Keep app-specific defaults and Spark logic in each application directory, and put reusable runtime helpers in `lib` when more than one SparkApplication needs them.
 
+## Declaring Semantics From Spark Applications
+
+Spark applications can describe the datasets they write with the lightweight `semantic_mapping` Python library. A declaration module exports `SEMANTIC_TABLES`, using ordinary Python calls such as `semantic_table(...)` and `column(...)`; the semantic mapper renders those declarations into RML/R2RML and uploads the generated mappings graph before projecting Unity Catalog metadata.
+
+The semantic Delta example keeps its declaration in `spark/spark-applications/applications/semantic-delta-test/dataset_semantics.py`. Keep the declaration next to the Spark code that owns the data shape, and mirror it into the semantic mapper packaging when the mapper should publish and project that dataset metadata.
+
 ## Spark configuration precedence
 
 Spark reads `spark-defaults.conf` as defaults only. The local Spark image merges those defaults with the Spark operator generated properties file at container startup. Values set on a `SparkApplication` under `spec.sparkConf` remain in the generated properties file and override matching image defaults. The image entrypoint also reads `MINIO_CONFIG_ENV_FILE`, when mounted, and exports AWS credentials so the shared S3A environment-variable credential provider works for drivers and executors.

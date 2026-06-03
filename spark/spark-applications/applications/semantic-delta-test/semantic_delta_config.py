@@ -3,6 +3,7 @@
 import os
 from dataclasses import dataclass
 
+from dataset_semantics import EXAMPLE_DATASET_SEMANTICS
 from minio_s3 import (
     DEFAULT_AWS_REGION,
     DEFAULT_MINIO_ENDPOINT,
@@ -11,8 +12,8 @@ from minio_s3 import (
 )
 
 
-DEFAULT_OUTPUT_PATH = "s3a://delta/example-dataset"
-DEFAULT_UC_TABLE = "unity.default.example_dataset"
+DEFAULT_OUTPUT_PATH = EXAMPLE_DATASET_SEMANTICS.source_uri
+DEFAULT_UC_TABLE = EXAMPLE_DATASET_SEMANTICS.full_name
 DEFAULT_UC_API_URL = "http://unity-catalog-unitycatalog-server.unity-catalog.svc.cluster.local:8080/api/2.1/unity-catalog"
 
 

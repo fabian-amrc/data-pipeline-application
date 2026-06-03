@@ -12,16 +12,18 @@ configMapGenerator:
       - semantic_mapper.py=mapper/semantic_mapper.py
       - semantic_lib_init.py=mapper/lib/__init__.py
       - semantic_config.py=mapper/lib/semantic_config.py
+      - semantic_definitions.py=mapper/lib/semantic_definitions.py
       - semantic_files.py=mapper/lib/semantic_files.py
       - semantic_fuseki.py=mapper/lib/semantic_fuseki.py
       - semantic_rdf.py=mapper/lib/semantic_rdf.py
       - semantic_unity_catalog.py=mapper/lib/semantic_unity_catalog.py
+      - semantic_mapping.py=mapper/lib/semantic_mapping.py
   - name: semantic-ontology
     files:
       - core.ttl=ontology/core.ttl
-  - name: semantic-mappings
+  - name: semantic-application-definitions
     files:
-      - example-dataset.rml.ttl=mappings/rml/example-dataset.rml.ttl
+      - dataset_semantics.py=definitions/dataset_semantics.py
   - name: semantic-shapes
     files:
       - ontology-quality.shacl.ttl=shapes/ontology-quality.shacl.ttl

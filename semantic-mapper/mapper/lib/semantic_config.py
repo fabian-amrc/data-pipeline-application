@@ -24,6 +24,8 @@ class GraphTarget:
 class SemanticMapperSettings:
     """Resolved runtime settings for Fuseki upload and UC projection."""
 
+    semantic_definitions_dir: Path
+    generated_mappings_dir: Path
     fuseki_data_url: str
     fuseki_ping_url: str
     fuseki_username: str
@@ -49,6 +51,12 @@ def load_settings() -> SemanticMapperSettings:
     shapes_dir = Path(os.getenv("SHAPES_DIR", "/semantic-mapper/shapes"))
 
     return SemanticMapperSettings(
+        semantic_definitions_dir=Path(
+            os.getenv("SEMANTIC_DEFINITIONS_DIR", "/semantic-mapper/definitions")
+        ),
+        generated_mappings_dir=Path(
+            os.getenv("GENERATED_MAPPINGS_DIR", "/tmp/semantic-mapper/generated-mappings")
+        ),
         fuseki_data_url=os.getenv(
             "FUSEKI_DATA_URL",
             "http://fuseki.fuseki.svc.cluster.local:3030/semantic/data",

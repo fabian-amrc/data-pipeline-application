@@ -40,6 +40,8 @@ spec:
               value: https://data-pipeline.local/graph/mappings
             - name: SHAPES_GRAPH_IRI
               value: https://data-pipeline.local/graph/shapes
+            - name: SEMANTIC_DEFINITIONS_DIR
+              value: /semantic-mapper/definitions
             - name: UNITY_CATALOG_API_URL
               value: http://unity-catalog-unitycatalog-server.unity-catalog.svc.cluster.local:8080/api/2.1/unity-catalog
             - name: PROJECT_TO_UNITY_CATALOG
@@ -56,6 +58,9 @@ spec:
             - name: mappings
               mountPath: /semantic-mapper/mappings
               readOnly: true
+            - name: semantic-definitions
+              mountPath: /semantic-mapper/definitions
+              readOnly: true
             - name: shapes
               mountPath: /semantic-mapper/shapes
               readOnly: true
@@ -70,6 +75,8 @@ spec:
                 path: lib/__init__.py
               - key: semantic_config.py
                 path: lib/semantic_config.py
+              - key: semantic_definitions.py
+                path: lib/semantic_definitions.py
               - key: semantic_files.py
                 path: lib/semantic_files.py
               - key: semantic_fuseki.py
@@ -78,12 +85,18 @@ spec:
                 path: lib/semantic_rdf.py
               - key: semantic_unity_catalog.py
                 path: lib/semantic_unity_catalog.py
+              - key: semantic_mapping.py
+                path: lib/semantic_mapping.py
         - name: ontology
           configMap:
             name: semantic-ontology
         - name: mappings
           configMap:
             name: semantic-mappings
+            optional: true
+        - name: semantic-definitions
+          configMap:
+            name: semantic-application-definitions
         - name: shapes
           configMap:
             name: semantic-shapes
