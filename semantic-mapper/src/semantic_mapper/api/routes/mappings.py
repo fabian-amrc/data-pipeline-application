@@ -5,7 +5,8 @@ from typing import Dict
 
 from fastapi import APIRouter, Request, Response, status
 
-from semantic_mapper.api.services import STORE, create_rml_mapping, create_simple_mapping, mapping_response
+from semantic_mapper.api.services.mappings import create_rml_mapping, create_simple_mapping, mapping_response
+from semantic_mapper.api.services.state import STORE
 
 
 router = APIRouter()

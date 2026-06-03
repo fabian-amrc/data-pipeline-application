@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter
 
-from semantic_mapper.api.services import (
+from semantic_mapper.api.services.ontologies import (
     identifier_scheme_payload,
     list_identifier_schemes,
     ontology_prefixes,

@@ -2,7 +2,8 @@
 
 from fastapi import APIRouter
 
-from semantic_mapper.api.services import STORE, project_mappings
+from semantic_mapper.api.services.projections import project_mappings
+from semantic_mapper.api.services.state import STORE
 
 
 router = APIRouter()
