@@ -14,7 +14,7 @@ It supports:
 
 ## Python Library
 
-The client library lives at `semantic-mapper/client/semantic_mapper.py`. It gives application authors a small Python API while keeping RML/Turtle generation inside the Semantic Mapper API.
+The client library is exposed by the `semantic_mapper` package in `src/semantic_mapper/__init__.py`. It gives application authors a small Python API while keeping RML/Turtle generation inside the Semantic Mapper API.
 
 ```python
 from semantic_mapper import SemanticMapper
@@ -77,7 +77,7 @@ mapping = (
 
 ## Identifier Schemes
 
-Identifier schemes are centrally defined in `ontology/identifier-schemes.json` and referenced by name.
+Identifier schemes are centrally defined in `resources/ontology/identifier-schemes.json` and referenced by name.
 
 Examples:
 
@@ -173,14 +173,19 @@ The API stores mapping records and RML documents under `SEMANTIC_MAPPER_STATE_DI
 
 ```text
 semantic-mapper/
-|- client/               # User-facing Python client/DSL
-|- mapper/               # REST API entrypoint and server helper modules
-|  `- lib/
-|     |- clients/        # External service clients for Fuseki and Unity Catalog
-|     |- mapping/        # Simple mapping payload to RML generation
-|     |- rdf/            # Turtle/RML file loading and parsing helpers
-|     `- storage.py      # Filesystem-backed mapping record store
-|- ontology/             # Ontology/RDL Turtle plus identifier scheme registry
-|- shapes/               # SHACL constraints for ontology and instance data
-`- mappings/             # Optional hand-authored RML/R2R2ML examples/docs
+|- pyproject.toml        # Python package metadata
+|- Dockerfile            # Packaged API image
+|- src/semantic_mapper/
+|  |- __init__.py        # User-facing Python client/DSL
+|  |- api/               # ASGI API application
+|  |- clients/           # External service clients for Fuseki and Unity Catalog
+|  |- mapping/           # Simple mapping payload to RML generation
+|  |- rdf/               # Turtle/RML file loading and parsing helpers
+|  `- storage.py         # Filesystem-backed mapping record store
+|- resources/
+|  |- ontology/          # Ontology/RDL Turtle plus identifier scheme registry
+|  |- shapes/            # SHACL constraints for ontology and instance data
+|  `- mappings/          # Optional hand-authored RML/R2R2ML examples/docs
+|- deploy/               # Argo CD app and Kubernetes manifests
+`- tests/
 ```

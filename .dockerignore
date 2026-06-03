@@ -1,0 +1,6 @@
+.git
+**/__pycache__/
+**/*.pyc
+.devcontainer/kubeconfig
+spark/operator/charts/
+unity-catalog/charts/

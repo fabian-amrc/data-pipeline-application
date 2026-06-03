@@ -20,14 +20,11 @@ spec:
     spec:
       containers:
         - name: api
-          image: python:3.12-slim
+          image: data-pipeline-semantic-mapper:0.1.0
           imagePullPolicy: IfNotPresent
-          command:
-            - python
-            - /app/api.py
           ports:
             - name: http
-              containerPort: 8080
+              containerPort: 8000
           resources:
             requests:
               cpu: "100m"
@@ -36,12 +33,16 @@ spec:
               cpu: "250m"
               memory: "256Mi"
           env:
-            - name: SEMANTIC_MAPPER_HTTP_PORT
-              value: "8080"
             - name: ONTOLOGY_ID
               value: manufacturing-rdl
             - name: SEMANTIC_MAPPER_STATE_DIR
               value: /semantic-mapper/state
+            - name: SEMANTIC_MAPPER_RESOURCES_DIR
+              value: /app/resources
+            - name: ONTOLOGY_DIR
+              value: /app/resources/ontology
+            - name: IDENTIFIER_SCHEMES_FILE
+              value: /app/resources/ontology/identifier-schemes.json
             - name: FUSEKI_DATA_URL
               value: http://fuseki.fuseki.svc.cluster.local:3030/semantic/data
             - name: FUSEKI_PING_URL
@@ -64,44 +65,9 @@ spec:
             initialDelaySeconds: 2
             periodSeconds: 5
           volumeMounts:
-            - name: script
-              mountPath: /app
-              readOnly: true
-            - name: ontology
-              mountPath: /semantic-mapper/ontology
-              readOnly: true
             - name: state
               mountPath: /semantic-mapper/state
       volumes:
-        - name: script
-          configMap:
-            name: semantic-mapper-script
-            items:
-              - key: api.py
-                path: api.py
-              - key: lib_init.py
-                path: lib/__init__.py
-              - key: clients_init.py
-                path: lib/clients/__init__.py
-              - key: fuseki_client.py
-                path: lib/clients/fuseki.py
-              - key: unity_catalog_client.py
-                path: lib/clients/unity_catalog.py
-              - key: mapping_init.py
-                path: lib/mapping/__init__.py
-              - key: mapping_generator.py
-                path: lib/mapping/generator.py
-              - key: rdf_init.py
-                path: lib/rdf/__init__.py
-              - key: rdf_files.py
-                path: lib/rdf/files.py
-              - key: rml_parser.py
-                path: lib/rdf/rml.py
-              - key: storage.py
-                path: lib/storage.py
-        - name: ontology
-          configMap:
-            name: semantic-ontology
         - name: state
           persistentVolumeClaim:
             claimName: semantic-mapper-state

@@ -1,1 +1,0 @@
-"""Semantic Mapper support package."""

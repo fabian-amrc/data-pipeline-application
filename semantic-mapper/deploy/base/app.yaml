@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: https://github.com/fabian-amrc/data-pipeline-application.git
     targetRevision: main
-    path: semantic-mapper
+    path: semantic-mapper/deploy/base
   destination:
     server: https://kubernetes.default.svc
     namespace: semantic-mapper

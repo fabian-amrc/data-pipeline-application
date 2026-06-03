@@ -1,4 +1,4 @@
-"""Client-side Python DSL for registering semantic mappings.
+"""Python client DSL for registering semantic mappings.
 
 Users describe datasets, subjects, and columns with ordinary Python objects.
 The Semantic Mapper REST API turns those declarations into RML/Turtle,

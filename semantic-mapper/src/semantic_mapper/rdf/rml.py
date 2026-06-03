@@ -10,7 +10,7 @@ import re
 from pathlib import Path
 from typing import Dict, Iterable, List
 
-from lib.rdf.files import read_all
+from semantic_mapper.rdf.files import read_all
 
 
 PREFIX_RE = re.compile(r"@prefix\s+([A-Za-z][\w-]*):\s+<([^>]+)>\s*\.")

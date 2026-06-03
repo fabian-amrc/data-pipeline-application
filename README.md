@@ -47,13 +47,11 @@ Kustomize `helmCharts`, using values files committed alongside each app.
 |  |- config/
 |  `- manifests/
 |- semantic-mapper/
-|  |- app.yaml
-|  |- kustomization.yaml
-|  |- mapper/
-|  |  `- lib/
-|  |- ontology/
-|  |- shapes/
-|  `- mappings/
+|  |- pyproject.toml
+|  |- Dockerfile
+|  |- src/semantic_mapper/
+|  |- resources/
+|  `- deploy/base/
 `- traefik/
    |- app.yaml
    |- kustomization.yaml

@@ -11,6 +11,6 @@ resources:
   - minio/tenant/app.yaml
   - unity-catalog/app.yaml
   - fuseki/app.yaml
-  - semantic-mapper/app.yaml
+  - semantic-mapper/deploy/base/app.yaml
   - traefik/app.yaml
   - traefik/ingressroutes/app.yaml

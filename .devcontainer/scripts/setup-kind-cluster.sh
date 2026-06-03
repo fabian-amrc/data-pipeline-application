@@ -11,6 +11,9 @@ HOST_KUBECONFIG="${HOST_KUBECONFIG:-${REPO_ROOT}/.devcontainer/kubeconfig}"
 SPARK_IMAGE="${SPARK_IMAGE:-data-pipeline-spark:3.5.3}"
 SPARK_IMAGE_CONTEXT="${SPARK_IMAGE_CONTEXT:-${REPO_ROOT}}"
 SPARK_IMAGE_BUILD="${SPARK_IMAGE_BUILD:-true}"
+SEMANTIC_MAPPER_IMAGE="${SEMANTIC_MAPPER_IMAGE:-data-pipeline-semantic-mapper:0.1.0}"
+SEMANTIC_MAPPER_IMAGE_CONTEXT="${SEMANTIC_MAPPER_IMAGE_CONTEXT:-${REPO_ROOT}/semantic-mapper}"
+SEMANTIC_MAPPER_IMAGE_BUILD="${SEMANTIC_MAPPER_IMAGE_BUILD:-true}"
 
 require_command() {
   if ! command -v "$1" >/dev/null 2>&1; then
@@ -63,6 +66,19 @@ build_and_load_spark_image() {
 
   echo "Loading Spark image into kind cluster: ${CLUSTER_NAME}"
   kind load docker-image "${SPARK_IMAGE}" --name "${CLUSTER_NAME}"
+}
+
+build_and_load_semantic_mapper_image() {
+  if [ "${SEMANTIC_MAPPER_IMAGE_BUILD}" != "true" ]; then
+    echo "Skipping Semantic Mapper image build because SEMANTIC_MAPPER_IMAGE_BUILD=${SEMANTIC_MAPPER_IMAGE_BUILD}"
+    return 0
+  fi
+
+  echo "Building Semantic Mapper image: ${SEMANTIC_MAPPER_IMAGE}"
+  docker build -t "${SEMANTIC_MAPPER_IMAGE}" "${SEMANTIC_MAPPER_IMAGE_CONTEXT}"
+
+  echo "Loading Semantic Mapper image into kind cluster: ${CLUSTER_NAME}"
+  kind load docker-image "${SEMANTIC_MAPPER_IMAGE}" --name "${CLUSTER_NAME}"
 }
 
 wait_for_control_plane() {
@@ -173,6 +189,7 @@ fi
 
 export_host_kubeconfig
 build_and_load_spark_image
+build_and_load_semantic_mapper_image
 
 echo "Ensuring namespace exists: ${ARGO_NAMESPACE}"
 kubectl create namespace "${ARGO_NAMESPACE}" --dry-run=client -o yaml | kubectl apply -f -
@@ -194,6 +211,7 @@ echo "Cluster setup complete."
 echo "Context: kind-${CLUSTER_NAME}"
 echo "Host kubeconfig: ${HOST_KUBECONFIG}"
 echo "Spark image: ${SPARK_IMAGE}"
+echo "Semantic Mapper image: ${SEMANTIC_MAPPER_IMAGE}"
 echo "Local k9s: KUBECONFIG=${HOST_KUBECONFIG} k9s"
 echo "Argo CD namespace: ${ARGO_NAMESPACE}"
 echo "Initial admin password: kubectl -n ${ARGO_NAMESPACE} get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d && echo"
