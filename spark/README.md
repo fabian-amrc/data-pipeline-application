@@ -44,7 +44,7 @@ kubectl get pods -n spark-jobs
 kubectl logs -n spark-jobs -l spark-role=driver
 ```
 
-6. The Delta test writes a small table to `s3a://delta/delta-test`, reads it back, and prints the resulting rows. The Spark image provides the default in-cluster MinIO S3A configuration, and applications read credentials from the `myminio-env-configuration` secret mounted at `/var/run/minio-tenant/config.env`. Override `OUTPUT_PATH` in `spark/spark-applications/applications/delta-test/delta-test-sparkapplication.yaml`, or override `spark.hadoop.fs.s3a.endpoint` in `spec.sparkConf`, if your tenant uses different values.
+6. The Delta test writes a small table to `s3a://delta/delta-test`, reads it back, and prints the resulting rows. The Spark image provides the default in-cluster MinIO S3A configuration, and applications read credentials from the `myminio-env-configuration` secret mounted at `/var/run/minio-tenant/config.env`. The MinIO tenant chart creates that development credential secret in `minio-tenant`; the Spark applications bundle creates the same hard-coded development secret in `spark-jobs` because pod volume mounts can only use secrets from their own namespace. Override `OUTPUT_PATH` in `spark/spark-applications/applications/delta-test/delta-test-sparkapplication.yaml`, or override `spark.hadoop.fs.s3a.endpoint` in `spec.sparkConf`, if your tenant uses different values.
 
 7. If you want Spark UI access, expose the driver web UI or deploy a Spark History Server.
    - The current sample is primarily a functional test of the operator.

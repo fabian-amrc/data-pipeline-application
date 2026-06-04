@@ -1,5 +1,9 @@
 tenant:
   name: data-pipeline
+  configSecret:
+    name: myminio-env-configuration
+    accessKey: minio
+    secretKey: minio123
   pools:
     - servers: 1
       name: pool-0

@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: spark-jobs
 resources:
   - spark-rbac.yaml
+  - minio-tenant-env-secret.yaml
   - applications/spark-pi/spark-pi-sparkapplication.yaml
   - applications/delta-test/delta-test-sparkapplication.yaml
   - applications/semantic-test/semantic-test-sparkapplication.yaml
