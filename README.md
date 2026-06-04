@@ -134,11 +134,13 @@ The repo deploys Traefik and exposes dashboard routes for:
 - `argocd.local` → Argo CD UI
 - `minio.local` → MinIO console
 - `unity-catalog.local` → Unity catalog UI
+- `fuseki.local` → Fuseki UI
+- `ontodia.local` → Unity graph viewer UI
 
 If you are running locally, add entries to your `/etc/hosts` file such as:
 
 ```text
-127.0.0.1 traefik.local argocd.local minio.local unity-catalog.local
+127.0.0.1 traefik.local argocd.local minio.local unity-catalog.local fuseki.local ontodia.local
 ```
 
 Then access the dashboards in your browser at the matching hostnames.

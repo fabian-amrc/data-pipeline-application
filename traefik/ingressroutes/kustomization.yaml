@@ -4,4 +4,7 @@ resources:
   - argocd-ingressroute.yaml
   - minio-ingressroute.yaml
   - fuseki-ingressroute.yaml
+  - ontodia-ingressroute.yaml
+  - ontodia-fuseki-proxy-ingressroute.yaml
+  - ontodia-fuseki-strip-middleware.yaml
   - unity-catalog-ingressroute.yaml

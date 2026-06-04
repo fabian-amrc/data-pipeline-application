@@ -1,0 +1,9 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: ontodia-fuseki-strip
+  namespace: fuseki
+spec:
+  stripPrefix:
+    prefixes:
+      - /fuseki

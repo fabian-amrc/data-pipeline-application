@@ -1,0 +1,15 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: ontodia-ui
+  namespace: ontodia
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`ontodia.local`)
+      kind: Rule
+      services:
+        - name: ontodia
+          namespace: ontodia
+          port: 80

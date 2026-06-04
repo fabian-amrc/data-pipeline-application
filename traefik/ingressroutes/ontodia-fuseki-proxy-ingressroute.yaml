@@ -1,0 +1,19 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: ontodia-fuseki-proxy
+  namespace: fuseki
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`ontodia.local`) && PathPrefix(`/fuseki`)
+      kind: Rule
+      priority: 100
+      middlewares:
+        - name: ontodia-fuseki-strip
+          namespace: fuseki
+      services:
+        - name: fuseki
+          namespace: fuseki
+          port: 3030
