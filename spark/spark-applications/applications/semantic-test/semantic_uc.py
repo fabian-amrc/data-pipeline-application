@@ -1,6 +1,7 @@
 """Unity Catalog assertions for semantic-test."""
 
 import json
+import os
 import urllib.parse
 import urllib.request
 

@@ -10,6 +10,13 @@ spec:
   imagePullPolicy: IfNotPresent
   mainApplicationFile: local:///app/delta_test.py
   sparkVersion: "3.5.3"
+  sparkConf:
+    spark.hadoop.fs.s3a.access.key: minio
+    spark.hadoop.fs.s3a.secret.key: minio123
+    spark.executorEnv.AWS_ACCESS_KEY_ID: minio
+    spark.executorEnv.AWS_SECRET_ACCESS_KEY: minio123
+    spark.kubernetes.driverEnv.AWS_ACCESS_KEY_ID: minio
+    spark.kubernetes.driverEnv.AWS_SECRET_ACCESS_KEY: minio123
   restartPolicy:
     type: Never
   volumes:
@@ -29,6 +36,16 @@ spec:
     env:
       - name: OUTPUT_PATH
         value: s3a://delta/delta-test
+      - name: AWS_ACCESS_KEY_ID
+        valueFrom:
+          secretKeyRef:
+            name: myminio-env-configuration
+            key: AWS_ACCESS_KEY_ID
+      - name: AWS_SECRET_ACCESS_KEY
+        valueFrom:
+          secretKeyRef:
+            name: myminio-env-configuration
+            key: AWS_SECRET_ACCESS_KEY
     volumeMounts:
       - name: delta-test-script
         mountPath: /app/delta_test.py
@@ -49,6 +66,16 @@ spec:
     env:
       - name: OUTPUT_PATH
         value: s3a://delta/delta-test
+      - name: AWS_ACCESS_KEY_ID
+        valueFrom:
+          secretKeyRef:
+            name: myminio-env-configuration
+            key: AWS_ACCESS_KEY_ID
+      - name: AWS_SECRET_ACCESS_KEY
+        valueFrom:
+          secretKeyRef:
+            name: myminio-env-configuration
+            key: AWS_SECRET_ACCESS_KEY
     volumeMounts:
       - name: delta-test-script
         mountPath: /app/delta_test.py

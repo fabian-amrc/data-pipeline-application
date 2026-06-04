@@ -8,13 +8,14 @@ from pyspark.sql.types import IntegerType, StringType, StructField, StructType
 
 from semantic_mapper import SemanticMapper
 from minio_s3 import bucket_from_s3a_uri, create_bucket_if_missing
-from semantic_uc import get_DATASET_NAME, verify_semantic_table
+from semantic_uc import get_uc_table, verify_semantic_table
 
 
 # Configuration for the semantic test
 DATASET_NAME = "unity.default.example_dataset"
 SOURCE_URI = "s3a://delta/example-dataset"
 RDF_CLASS = "dpa:Dataset"
+RDF_CLASS_IRI = "https://w3id.org/amrc/manufacturing-rdl/dataset#Dataset"
 
 
 # Example dataset schema and data to write as Delta and register with UC semantics.
@@ -64,7 +65,7 @@ def main():
         registration = dataset.register_and_project()
         print("Registered semantic mapping:", json.dumps(registration, sort_keys=True))
 
-        uc_info = get_DATASET_NAME(UC_API_URL, DATASET_NAME)
+        uc_info = get_uc_table(DATASET_NAME)
         verify_semantic_table(uc_info, DATASET_NAME, RDF_CLASS_IRI, storage_location)
         print("Verified UC semantic table registration:", json.dumps(uc_info, sort_keys=True))
         print("Semantic test complete.")

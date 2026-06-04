@@ -13,6 +13,13 @@ spec:
     pyFiles:
       - local:///opt/data-pipeline/semantic_mapper_client.zip
   sparkVersion: "3.5.3"
+  sparkConf:
+    spark.hadoop.fs.s3a.access.key: minio
+    spark.hadoop.fs.s3a.secret.key: minio123
+    spark.executorEnv.AWS_ACCESS_KEY_ID: minio
+    spark.executorEnv.AWS_SECRET_ACCESS_KEY: minio123
+    spark.kubernetes.driverEnv.AWS_ACCESS_KEY_ID: minio
+    spark.kubernetes.driverEnv.AWS_SECRET_ACCESS_KEY: minio123
   restartPolicy:
     type: Never
   volumes:
@@ -29,10 +36,27 @@ spec:
     labels:
       version: 3.5.3
     serviceAccount: spark-operator-spark
+    env:
+      - name: AWS_ACCESS_KEY_ID
+        valueFrom:
+          secretKeyRef:
+            name: myminio-env-configuration
+            key: AWS_ACCESS_KEY_ID
+      - name: AWS_SECRET_ACCESS_KEY
+        valueFrom:
+          secretKeyRef:
+            name: myminio-env-configuration
+            key: AWS_SECRET_ACCESS_KEY
     volumeMounts:
       - name: semantic-test-script
-        mountPath: /app
-        readOnly: true
+        mountPath: /app/semantic_test.py
+        subPath: semantic_test.py
+      - name: semantic-test-script
+        mountPath: /app/minio_s3.py
+        subPath: minio_s3.py
+      - name: semantic-test-script
+        mountPath: /app/semantic_uc.py
+        subPath: semantic_uc.py
       - name: minio-tenant-env
         mountPath: /var/run/minio-tenant/config.env
         subPath: config.env
@@ -43,10 +67,27 @@ spec:
     memory: 1g
     labels:
       version: 3.5.3
+    env:
+      - name: AWS_ACCESS_KEY_ID
+        valueFrom:
+          secretKeyRef:
+            name: myminio-env-configuration
+            key: AWS_ACCESS_KEY_ID
+      - name: AWS_SECRET_ACCESS_KEY
+        valueFrom:
+          secretKeyRef:
+            name: myminio-env-configuration
+            key: AWS_SECRET_ACCESS_KEY
     volumeMounts:
       - name: semantic-test-script
-        mountPath: /app
-        readOnly: true
+        mountPath: /app/semantic_test.py
+        subPath: semantic_test.py
+      - name: semantic-test-script
+        mountPath: /app/minio_s3.py
+        subPath: minio_s3.py
+      - name: semantic-test-script
+        mountPath: /app/semantic_uc.py
+        subPath: semantic_uc.py
       - name: minio-tenant-env
         mountPath: /var/run/minio-tenant/config.env
         subPath: config.env

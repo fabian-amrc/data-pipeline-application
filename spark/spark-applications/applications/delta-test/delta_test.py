@@ -23,7 +23,7 @@ access_key, secret_key = resolve_minio_credentials()
 region = os.getenv("AWS_REGION", DEFAULT_AWS_REGION)
 bucket = bucket_from_s3a_uri(output_path, "OUTPUT_PATH")
 
-create_bucket_if_missing(endpoint, access_key, secret_key, bucket, region)
+create_bucket_if_missing(bucket, endpoint, access_key, secret_key, region)
 
 spark = SparkSession.builder.appName("delta-minio-test").getOrCreate()
 schema = StructType(
