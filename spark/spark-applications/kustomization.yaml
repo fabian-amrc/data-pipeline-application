@@ -2,6 +2,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: spark-jobs
 resources:
+  - spark-rbac.yaml
   - applications/spark-pi/spark-pi-sparkapplication.yaml
   - applications/delta-test/delta-test-sparkapplication.yaml
   - applications/semantic-test/semantic-test-sparkapplication.yaml
