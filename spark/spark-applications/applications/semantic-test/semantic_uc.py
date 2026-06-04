@@ -5,8 +5,13 @@ import urllib.parse
 import urllib.request
 
 
-def get_uc_table(api_url, full_name):
+UC_API_URL = "http://unity-catalog-unitycatalog-server.unity-catalog.svc.cluster.local:8080/api/2.1/unity-catalog"
+
+
+def get_uc_table(full_name, api_url = None):
     """Fetch one Unity Catalog table by fully-qualified table name."""
+
+    api_url = api_url or os.getenv("UC_API_URL", UC_API_URL)
 
     encoded_name = urllib.parse.quote(full_name, safe="")
     request = urllib.request.Request(f"{api_url}/tables/{encoded_name}", method="GET")

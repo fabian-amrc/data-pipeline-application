@@ -89,12 +89,17 @@ def bucket_from_s3a_uri(uri, field_name="S3A URI"):
     return parsed.netloc
 
 
-def create_bucket_if_missing(endpoint, access_key, secret_key, bucket, region):
+def create_bucket_if_missing(bucket, endpoint = None, access_key = None, secret_key = None, region = None):
     """Create a MinIO bucket if it is absent.
 
     This sends a signed S3 `PUT /{bucket}` request using AWS SigV4. Existing
     buckets owned by the configured credentials are accepted as success.
     """
+    endpoint = endpoint or os.getenv("MINIO_ENDPOINT", DEFAULT_MINIO_ENDPOINT)
+    if not access_key or not secret_key:
+        access_key, secret_key = resolve_minio_credentials()
+    region = region or os.getenv("AWS_REGION", DEFAULT_AWS_REGION)
+
     parsed = urllib.parse.urlparse(endpoint)
     if parsed.scheme not in ("http", "https") or not parsed.netloc:
         raise ValueError(f"MINIO_ENDPOINT must be an http(s) URL, got: {endpoint}")
