@@ -3,4 +3,5 @@ kind: Kustomization
 resources:
   - argocd-ingressroute.yaml
   - minio-ingressroute.yaml
+  - fuseki-ingressroute.yaml
   - unity-catalog-ingressroute.yaml
