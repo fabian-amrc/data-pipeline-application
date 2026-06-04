@@ -24,8 +24,12 @@ def verify_semantic_table(uc_info, full_name, class_iri, storage_location):
     """Assert that UC metadata matches the registered semantic mapping."""
 
     properties = uc_info.get("properties") or {}
-    if properties.get("semantic.class") != class_iri:
-        raise RuntimeError(f"UC table {full_name} is missing semantic.class property: {properties}")
+    actual_class = properties.get("semantic.class")
+    if actual_class != class_iri:
+        raise RuntimeError(
+            f"UC table {full_name} semantic.class mismatch: {actual_class!r} != {class_iri!r}; "
+            f"properties: {properties}"
+        )
 
     if uc_info.get("storage_location") != storage_location:
         raise RuntimeError(

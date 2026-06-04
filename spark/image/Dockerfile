@@ -51,13 +51,9 @@ ADD https://repo1.maven.org/maven2/org/apache/commons/commons-pool2/2.12.1/commo
 
 COPY spark/image/conf/spark-defaults.conf /opt/bitnami/spark/conf.default/spark-defaults.conf
 COPY spark/image/scripts/entrypoint.sh /opt/data-pipeline/entrypoint.sh
-COPY semantic-mapper/src/semantic_mapper/__init__.py /tmp/semantic-mapper-client/semantic_mapper/__init__.py
+COPY semantic-mapper/src/semantic_mapper /opt/data-pipeline/python/semantic_mapper
 
-RUN cd /tmp/semantic-mapper-client \
-  && python3 -m zipfile -c /opt/data-pipeline/semantic_mapper_client.zip semantic_mapper/__init__.py \
-  && rm -rf /tmp/semantic-mapper-client
-
-RUN chmod -R a+r /opt/bitnami/spark/jars /opt/bitnami/spark/conf.default/spark-defaults.conf \
+RUN chmod -R a+r /opt/bitnami/spark/jars /opt/bitnami/spark/conf.default/spark-defaults.conf /opt/data-pipeline/python \
   && chmod +x /opt/data-pipeline/entrypoint.sh
 
 WORKDIR /app

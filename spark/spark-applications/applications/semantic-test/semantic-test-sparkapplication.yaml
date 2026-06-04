@@ -9,17 +9,16 @@ spec:
   image: data-pipeline-spark:3.5.3
   imagePullPolicy: IfNotPresent
   mainApplicationFile: local:///app/semantic_test.py
-  deps:
-    pyFiles:
-      - local:///opt/data-pipeline/semantic_mapper_client.zip
   sparkVersion: "3.5.3"
   sparkConf:
     spark.hadoop.fs.s3a.access.key: minio
     spark.hadoop.fs.s3a.secret.key: minio123
     spark.executorEnv.AWS_ACCESS_KEY_ID: minio
     spark.executorEnv.AWS_SECRET_ACCESS_KEY: minio123
+    spark.executorEnv.PYTHONPATH: /opt/data-pipeline/python:/app
     spark.kubernetes.driverEnv.AWS_ACCESS_KEY_ID: minio
     spark.kubernetes.driverEnv.AWS_SECRET_ACCESS_KEY: minio123
+    spark.kubernetes.driverEnv.PYTHONPATH: /opt/data-pipeline/python:/app
   restartPolicy:
     type: Never
   volumes:
@@ -47,6 +46,8 @@ spec:
           secretKeyRef:
             name: myminio-env-configuration
             key: AWS_SECRET_ACCESS_KEY
+      - name: PYTHONPATH
+        value: /opt/data-pipeline/python:/app
     volumeMounts:
       - name: semantic-test-script
         mountPath: /app/semantic_test.py
@@ -78,6 +79,8 @@ spec:
           secretKeyRef:
             name: myminio-env-configuration
             key: AWS_SECRET_ACCESS_KEY
+      - name: PYTHONPATH
+        value: /opt/data-pipeline/python:/app
     volumeMounts:
       - name: semantic-test-script
         mountPath: /app/semantic_test.py

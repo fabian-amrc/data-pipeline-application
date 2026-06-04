@@ -73,7 +73,7 @@ Spark reads `spark-defaults.conf` as defaults only. The local Spark image merges
 
 ## Local Spark image
 
-The kind bootstrap script builds `data-pipeline-spark:3.5.3` using `spark/image/Dockerfile` from the repository root and loads it into the `data-pipeline` kind cluster. The root build context lets the image package the Semantic Mapper Python client from `semantic-mapper/src` for Spark `pyFiles` usage. To add a local MinIO CA certificate, place it at `spark/image/certs/minikubeCA.crt` before running the bootstrap script.
+The kind bootstrap script builds `data-pipeline-spark:3.5.3` using `spark/image/Dockerfile` from the repository root and loads it into the `data-pipeline` kind cluster. The root build context lets the image package the Semantic Mapper Python client from `semantic-mapper/src` under `/opt/data-pipeline/python`, which Spark applications add to `PYTHONPATH`. To add a local MinIO CA certificate, place it at `spark/image/certs/minikubeCA.crt` before running the bootstrap script.
 
 You can build and load the image manually with:
 

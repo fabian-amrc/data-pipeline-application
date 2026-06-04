@@ -15,7 +15,7 @@ from semantic_uc import get_uc_table, verify_semantic_table
 DATASET_NAME = "unity.default.example_dataset"
 SOURCE_URI = "s3a://delta/example-dataset"
 RDF_CLASS = "dpa:Dataset"
-RDF_CLASS_IRI = "https://w3id.org/amrc/manufacturing-rdl/dataset#Dataset"
+RDF_CLASS_IRI = "https://data-pipeline.local/ontology/Dataset"
 
 
 # Example dataset schema and data to write as Delta and register with UC semantics.
