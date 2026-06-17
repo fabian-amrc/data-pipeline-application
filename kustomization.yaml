@@ -15,3 +15,4 @@ resources:
   - semantic-mapper/deploy/base/app.yaml
   - traefik/app.yaml
   - traefik/ingressroutes/app.yaml
+  - rdf-graph-explorer/app.yaml

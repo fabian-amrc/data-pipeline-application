@@ -1,0 +1,15 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: fuseki-ui
+  namespace: fuseki
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`graph-explorer.local`)
+      kind: Rule
+      services:
+        - name: rdf-graph-explorer
+          namespace: rdf-graph-explorer
+          port: 80
